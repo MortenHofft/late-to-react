@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import OccurrenceStore from '../stores/OccurrenceStore';
+import FilterStore from '../stores/FilterStore';
 import * as OccurrenceActions from '../actions/OccurrenceActions';
 import * as FilterActions from '../actions/FilterActions';
 
@@ -35,7 +36,7 @@ class Gallery extends Component {
 
   next() {
     //OccurrenceActions.getOccurrences({offset: 10});
-    FilterActions.updateParam('offset', 10);
+    FilterActions.updateParam('offset', FilterStore.getQuery('offset') + 10);
   }
 
   render() {

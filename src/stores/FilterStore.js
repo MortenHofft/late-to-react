@@ -11,9 +11,12 @@ class FilterStore extends EventEmitter {
         };
     }
 
-    getQuery() {
-        console.log('get query from store', this.query);
-        return this.query;
+    getQuery(key) {
+        if (key) {
+            return this.query[key];
+        } else {
+            return this.query;
+        }
     }
 
     handleActions(action) {
