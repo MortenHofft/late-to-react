@@ -2,7 +2,7 @@
     "presets": [
       [ "env", {
         "targets": {
-          "safari": 10
+          "chrome": 67
         },
         "modules": false,
         "useBuiltIns": true,
