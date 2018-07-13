@@ -1,42 +1,56 @@
 import React, { Component } from 'react';
+import queryString from 'query-string'
+import _ from 'lodash';
 
-import OccurrenceStore from '../stores/OccurrenceStore';
-import FilterStore from '../stores/FilterStore';
-import * as OccurrenceActions from '../actions/OccurrenceActions';
-import * as FilterActions from '../actions/FilterActions';
-
-class Gallery extends Component {
+class Table extends Component {
   constructor(props) {
     super(props);
-    this.getOccurrences = this.getOccurrences.bind(this);
-    OccurrenceActions.getOccurrences({});
+    this.updateFilter = this.updateFilter.bind(this);
+    this.updateResults = this.updateResults.bind(this);
     this.state = {
-      occurrences: OccurrenceStore.getAll()
+      page: {limit: 5, offset: 0},
+      occurrences: []
     }
   }
 
   componentDidMount() {
-    OccurrenceStore.on('change', this.getOccurrences);
+    this.updateResults();
+    // OccurrenceStore.on('change', this.getOccurrences);
   }
 
   componentWillUnmount() {
     // Cancel fetch callback?
-    OccurrenceStore.removeListener('change', this.getOccurrences);
   }
 
-  getOccurrences() {
-    this.setState({
-      occurrences: OccurrenceStore.getAll()
-    });
+  componentDidUpdate(prevProps) {
+    if (prevProps.filter !== this.props.filter) {
+      this.updateResults();
+    }
   }
 
-  reload() {
-    FilterActions.updateParam('offset', 0);
+  updateResults() {
+    let filter = _.merge({}, this.props.filter, this.state.page);
+    fetch('https://api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter))
+      .then(res => res.json())
+      .then(
+        (result) => {
+            this.setState({occurrences: result.results.map((e) => (e.scientificName))});
+        },
+        // Note: it's important to handle errors here
+        // instead of a catch() block so that we don't swallow
+        // exceptions from actual bugs in components.
+        (error) => {
+            this.setState({error: true});
+        }
+      )
   }
 
-  next() {
-    //OccurrenceActions.getOccurrences({offset: 10});
-    FilterActions.updateParam('offset', FilterStore.getQuery('offset') + 10);
+  nextPage() {
+    this.setState({page: {offset: this.state.page.offset + this.state.page.limit, limit: this.state.page.limit}}, this.updateResults);
+  }
+
+  updateFilter(key, value) {
+    this.props.updateFilter(key, value);
   }
 
   render() {
@@ -50,11 +64,15 @@ class Gallery extends Component {
       <div>
         <h4>Table component</h4>
         <ul>{listItems}</ul>
-        <button onClick={this.reload.bind(this)}>Get occurrences</button>
-        <button onClick={this.next.bind(this)}>next page</button>
+        <button onClick={() => this.nextPage()}>next</button>
+        <div>
+          <span>Filter</span>
+          {JSON.stringify(this.props.filter, null, 2)}
+          {JSON.stringify(this.state.page , null, 2)}
+        </div>
       </div>
     );
   }
 }
 
-export default Gallery;
+export default Table;
