@@ -1,4 +1,4 @@
-.App {
+/* .App {
   text-align: center;
 }
 
@@ -25,4 +25,106 @@
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+} */
+
+
+body {
+  background: #f2f6f9;
+  height: 100%;
+  color: #2e3c43;
+  font-size: 14px;
+  box-sizing: border-box;
+  font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+
+.menu {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 56px;
+  background: #1785fb;
+}
+
+main {
+  margin-right: 400px;
+  margin-left: 56px;
+}
+
+.navDrawer {
+  width: 350px;
+  overflow: auto;
+  height: 100%;
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  padding: 10px;
+}
+.navDrawer > section {
+  border-bottom: 1px solid #eee;
+}
+
+.viewSelector {
+  display: inline-block;
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  list-style: none;
+}
+
+.viewSelector li {
+  display: inline-block;
+  padding: 10px;
+}
+.viewSelector li a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.viewSelector li.active a {
+  background: darkseagreen;
+  color: white;
+}
+
+
+
+.filter {
+  background: white;
+}
+.filter__content {
+  padding: 20px;
+  font-size: 12px;
+}
+.filter__content h4 {
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 500;
+}
+/*Loader*/
+.loader {
+  height: 1px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  /*background-color: #ddd;*/
+}
+.loader:before{
+  display: block;
+  position: absolute;
+  content: "";
+  left: -200px;
+  width: 200px;
+  height: 1px;
+  background-color: #2980b9;
+  animation: loading 1.5s linear infinite;
+}
+
+@keyframes loading {
+    from {left: -200px; width: 30%;}
+    50% {width: 30%;}
+    70% {width: 70%;}
+    80% { left: 50%;}
+    95% {left: 120%;}
+    to {left: 100%;}
 }

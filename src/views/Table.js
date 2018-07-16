@@ -23,7 +23,7 @@ class Table extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.filter !== this.props.filter) {
+    if (prevProps.filter.hash !== this.props.filter.hash) {
       this.updateResults();
     }
   }

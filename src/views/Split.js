@@ -8,10 +8,10 @@ function Summary(props) {
         <div style={style}>
             <h4>Split view</h4>
             <div style={style}>
-                <Table filter={props.filter} updateFilter={props.updateFilter}/>
+                <Table filter={props.filter} updateFilter={props.updateFilter} location={props.location}/>
             </div>
             <div style={style}>
-                <Gallery filter={props.filter} updateFilter={props.updateFilter}/>
+                <Gallery filter={props.filter} updateFilter={props.updateFilter} location={props.location}/>
             </div>
         </div>
     );
