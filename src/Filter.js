@@ -28,3 +28,7 @@ export default Filter;
   <pre>{JSON.stringify(this.props.filter, null, 2)}</pre>
   <button onClick={() => this.props.updateFilter('datasetKey', '84d26682-f762-11e1-a439-00145eb45e9a')}>update filter to Fungal records</button>
 */
+
+/*
+list: all option, search option, pagination, counts, negation?
+*/
