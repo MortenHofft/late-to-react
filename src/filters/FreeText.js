@@ -17,11 +17,11 @@ function asArray(value) {
 class FreeText extends Component {
   constructor(props) {
     super(props);
-    
+
     this.handleChange = this.handleChange.bind(this);
     this.updateFacets = this.updateFacets.bind(this);
 
-    this.state = {value: ''};
+    this.state = { value: '' };
   }
 
   componentDidMount() {
@@ -40,56 +40,89 @@ class FreeText extends Component {
   }
 
   updateFacets() {
-    let filter = _.merge({}, this.props.filter, {limit: 0, facet: 'datasetKey', facetMultiselect: true});
+    let filter = _.merge({}, this.props.filter, { limit: 0, facet: 'datasetKey', facetMultiselect: true });
     fetch('https://api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter))
       .then(res => res.json())
       .then(
         (result) => {
-          this.setState({facets: result.facets[0].counts});
+          this.setState({ facets: result.facets[0].counts });
         },
         // Note: it's important to handle errors here
         // instead of a catch() block so that we don't swallow
         // exceptions from actual bugs in components.
         (error) => {
-            this.setState({error: true});
+          this.setState({ error: true });
         }
       )
   }
 
   handleChange(event) {
-    this.setState({value: event.target.value});
+    this.setState({ value: event.target.value });
   }
 
   render() {
     let props = this.props;
-    let datasets = asArray(this.props.filter.datasetKey).map(function(e){
-      return <li key={e} onClick={() => props.updateFilter('datasetKey', e, 'REMOVE')}><DatasetTitle id={e}/> </li>
+    let datasets = asArray(this.props.filter.datasetKey).map(function (e) {
+      return <li key={e} onClick={() => props.updateFilter('datasetKey', e, 'REMOVE')}><DatasetTitle id={e} /> </li>
     });
     let facets = asArray(this.state.facets);
-    _.remove(facets, function(e){
+    _.remove(facets, function (e) {
       return asArray(props.filter.datasetKey).indexOf(e.name) !== -1;
     });
-    facets = facets.map(function(e){
-      return <li key={e.name} onClick={() => props.updateFilter('datasetKey', e.name, 'ADD')}><DatasetTitle id={e.name}/> {e.count}</li>
+    facets = facets.map(function (e) {
+      return <li key={e.name} onClick={() => props.updateFilter('datasetKey', e.name, 'ADD')}><DatasetTitle id={e.name} /> {e.count}</li>
     });
     return (
+      <div>
         <div className="filter">
-            <div className="loader"></div>
-            <div className="filter__content">
-              <h4>Datasets</h4>
-              <label>
-                Name:
+          <div className="loader"></div>
+          <div className="filter__content">
+            <h4>Datasets</h4>
+            <label>
+              Name:
                 <input type="text" value={this.state.value} onChange={this.handleChange} />
-              </label>
-              <button disabled={ this.state.value === '' } onClick={() => this.props.updateFilter('datasetKey', this.state.value, 'ADD')}>addFilter</button>
+            </label>
+            <button disabled={this.state.value === ''} onClick={() => this.props.updateFilter('datasetKey', this.state.value, 'ADD')}>addFilter</button>
+            <ul>
+              {datasets}
+            </ul>
+            <ul>
+              {facets}
+            </ul>
+          </div>
+        </div>
+        <div className="filter">
+          <div className="loader"></div>
+          <div className="filter__content">
+            <div className="filter__header">
+              <h3 className="ellipsis">Datasets</h3>
+              <div>
+                <a>S</a>
+                <a>D</a>
+              </div>
+            </div>
+            <div className="filter__info">
+              <dl class="u-secondaryTextColor u-upperCase u-small">
+                <dt class="CDB-Widget-infoCount">1.302</dt><dd class="CDB-Widget-infoDescription">Datasets</dd>
+                <dt class="CDB-Widget-infoCount">26</dt><dd class="CDB-Widget-infoDescription">in view</dd>
+              </dl>
+            </div>
+            <div className="filter__search">
+              <input placeholder="Search" />
+            </div>
+            <div className="filter__actions u-secondaryTextColor u-upperCase u-small">
+              <p>2 selected</p>
+              <a>All</a>
+            </div>
+            <div className="filter__options">
               <ul>
-                {datasets}
-              </ul>
-              <ul>
-                {facets}
+                <li>
+                </li>
               </ul>
             </div>
+          </div>
         </div>
+      </div>
     );
   }
 }

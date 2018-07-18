@@ -82,7 +82,7 @@ class App extends Component {
                 <Route path="/split" render={(props) => <Split filter={this.state.filter} updateFilter={this.updateFilter} />} />
                 <Route component={NoMatch} />
               </Switch>
-              <ul class="viewSelector">
+              <ul className="viewSelector">
                 <li>
                   <Link to="/">Table</Link>
                 </li>
