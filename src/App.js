@@ -41,8 +41,10 @@ class App extends Component {
 
   updateFilter(param, value, action) {
     let paramValues = asArray(this.state.filter[param]);
-    console.log('asdf');
-    if (action === 'ADD') {
+    if (action === 'CLEAR') {
+      console.log('clear');
+      paramValues = '';
+    } else if (action === 'ADD') {
       paramValues.push(value);
     } else if (action === 'REMOVE') {
       _.remove(paramValues, function(n) {
@@ -51,8 +53,10 @@ class App extends Component {
     } else {
       paramValues = [value];
     }
-    paramValues = _.uniq(paramValues);
     let filter = _.merge({}, this.state.filter, {[param]: paramValues});
+    if (!paramValues) {
+      delete filter[param];
+    }
     delete filter.hash;
     history.push(window.location.pathname + '?' + queryString.stringify(filter));
     // filter.hash = objectHash(filter);

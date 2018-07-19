@@ -12,7 +12,6 @@ class Suggest extends Component {
   }
 
   componentDidMount() {
-    this.getSuggestions();
   }
 
   componentWillUnmount() {
@@ -20,9 +19,6 @@ class Suggest extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // if (this.props.value !== nextProps.value) {
-    //   this.setState({value: nextProps.value});
-    // }
     this.setState({value: nextProps.value});
   }
 

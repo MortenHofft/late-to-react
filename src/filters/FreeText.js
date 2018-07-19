@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import queryString from 'query-string'
+import humanize from 'humanize-num'
+
 import Suggest from './Suggest'
+import If from './If'
 
 import DatasetTitle from './DatasetTitle';
 
@@ -24,7 +27,7 @@ class FreeText extends Component {
     this.formatOption = this.formatOption.bind(this);
     this.onSelect = this.onSelect.bind(this);
 
-    this.state = { value: 'hej' };
+    this.state = { value: '' };
   }
 
   componentDidMount() {
@@ -43,12 +46,14 @@ class FreeText extends Component {
   }
 
   updateFacets() {
-    let filter = _.merge({}, this.props.filter, { limit: 0, facet: 'datasetKey', facetMultiselect: true });
-    fetch('https://api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter))
-      .then(res => res.json())
+    let filter = _.merge({}, this.props.filter, { limit: 0, facet: 'datasetKey' });
+    delete filter.hash;
+    let p1 = fetch('https://api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter));
+    this.setState({loading: true});
+    p1.then(res => res.json())
       .then(
         (result) => {
-          this.setState({ facets: result.facets[0].counts });
+          this.setState({ facets: result.facets[0].counts, count: result.count });
         },
         // Note: it's important to handle errors here
         // instead of a catch() block so that we don't swallow
@@ -57,22 +62,48 @@ class FreeText extends Component {
           this.setState({ error: true });
         }
       )
+    filter.datasetKey = undefined;
+    let p2 = fetch('https://api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter));
+    p2.then(res => res.json())
+      .then(
+        (result) => {
+          this.setState({ multiFacets: result.facets[0].counts, total: result.count });
+        },
+        // Note: it's important to handle errors here
+        // instead of a catch() block so that we don't swallow
+        // exceptions from actual bugs in components.
+        (error) => {
+          this.setState({ error: true });
+        }
+      );
+    Promise.all([p1, p2])
+      .then(() => {this.setState({loading: false})})
+      .catch(() => {this.setState({loading: false})});
   }
 
   handleChange(event) {
     this.setState({ value: event.target.value });
   }
 
-  formatOption(id, count) {
+  formatOption(id, count, total, action, active) {
+    action = action || 'ADD';
+    let progress;
+    count = count || 0;
+    total = total || count;
+    let width = {width: (100*count/total) + '%'};
+    progress = (
+      <div className="percentageBar"><div style={width}></div></div>
+    );
+    
     return (
-      <li key={id}>
-        <label onClick={() => this.props.updateFilter('datasetKey', id, 'ADD')}>
+      <li key={id} className={active ? 'active' : 'disabled'}>
+        <label onClick={() => this.props.updateFilter('datasetKey', id, action)}>
           <input type="checkbox" />
           <div className="filter__facet">
             <div className="filter__facet__title">
-              <div className="u-ellipsis u-semibold u-medium"><DatasetTitle id={id} /></div><div className="u-secondaryTextColor u-small">{count}</div>
+              <div className="u-ellipsis u-semibold u-medium"><DatasetTitle id={id} /></div><If show={count > 0}><div className="u-secondaryTextColor u-small">{ humanize(count) }</div></If>
             </div>
-            <div className="percentageBar"><div></div></div>
+            {progress}
           </div>
         </label>
       </li>
@@ -86,22 +117,31 @@ class FreeText extends Component {
 
   render() {
     let props = this.props;
+    let count = this.state.count;
+    let total = this.state.total;
     let formatOption = this.formatOption;
-    let datasets = asArray(this.props.filter.datasetKey).map(function (e) {
-      //return <li key={e} onClick={() => props.updateFilter('datasetKey', e, 'REMOVE')}><DatasetTitle id={e} /> </li>
-      return formatOption(e);
-    });
+    
     let facets = asArray(this.state.facets);
-    _.remove(facets, function (e) {
+    let datasets = asArray(this.props.filter.datasetKey);
+    if (facets.length > 0) {
+      facets = _.keyBy(facets, 'name');
+    }
+    datasets = datasets.map(function (e) {
+      return formatOption(e, _.get(facets, e + '.count'), count, 'REMOVE', true);
+    });
+    let multiFacets = asArray(this.state.multiFacets);
+    _.remove(multiFacets, function (e) {
       return asArray(props.filter.datasetKey).indexOf(e.name) !== -1;
     });
-    facets = facets.map(function (e) {
-      return formatOption(e.name, e.count);
+    multiFacets = multiFacets.map(function (e) {
+      return formatOption(e.name, e.count, total, 'ADD', datasets.length == 0);
     });
+    let selectedCount = asArray(this.props.filter.datasetKey).length;
+    
     return (
       <div>
         <div className="filter">
-          <div className="loader"></div>
+          <If show={this.state.loading}><div className="loader"></div></If>
           <div className="filter__content">
             <div className="filter__header">
               <h3 className="ellipsis">Datasets</h3>
@@ -120,13 +160,18 @@ class FreeText extends Component {
               <Suggest endpoint="https://api.gbif.org/v1/occurrence/search/institutionCode" onSelect={this.onSelect} value={this.state.value} />
             </div>
             <div className="filter__actions u-secondaryTextColor u-upperCase u-small">
-              <p className="u-semibold">2 selected</p>
-              <a>All</a>
+              <If show={selectedCount > 0}>
+                <p className="u-semibold">{selectedCount} selected</p>
+              </If>
+              <If show={selectedCount == 0}>
+                <p>&nbsp;</p>
+              </If>
+              <button className="u-actionTextColor" onClick={() => this.props.updateFilter('datasetKey', null, 'CLEAR')}>All</button>
             </div>
             <div className="filter__options">
               <ul>
                 {datasets}
-                {facets}
+                {multiFacets}
               </ul>
             </div>
           </div>
