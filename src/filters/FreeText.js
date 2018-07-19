@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import queryString from 'query-string'
+import Suggest from './Suggest'
 
 import DatasetTitle from './DatasetTitle';
 
@@ -20,8 +21,10 @@ class FreeText extends Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.updateFacets = this.updateFacets.bind(this);
+    this.formatOption = this.formatOption.bind(this);
+    this.onSelect = this.onSelect.bind(this);
 
-    this.state = { value: '' };
+    this.state = { value: 'hej' };
   }
 
   componentDidMount() {
@@ -60,64 +63,70 @@ class FreeText extends Component {
     this.setState({ value: event.target.value });
   }
 
+  formatOption(id, count) {
+    return (
+      <li key={id}>
+        <label onClick={() => this.props.updateFilter('datasetKey', id, 'ADD')}>
+          <input type="checkbox" />
+          <div className="filter__facet">
+            <div className="filter__facet__title">
+              <div className="u-ellipsis u-semibold u-medium"><DatasetTitle id={id} /></div><div className="u-secondaryTextColor u-small">{count}</div>
+            </div>
+            <div className="percentageBar"><div></div></div>
+          </div>
+        </label>
+      </li>
+    );
+  }
+
+  onSelect(val) {
+    console.log('selected', val);
+    this.setState({value: ''});
+  }
+
   render() {
     let props = this.props;
+    let formatOption = this.formatOption;
     let datasets = asArray(this.props.filter.datasetKey).map(function (e) {
-      return <li key={e} onClick={() => props.updateFilter('datasetKey', e, 'REMOVE')}><DatasetTitle id={e} /> </li>
+      //return <li key={e} onClick={() => props.updateFilter('datasetKey', e, 'REMOVE')}><DatasetTitle id={e} /> </li>
+      return formatOption(e);
     });
     let facets = asArray(this.state.facets);
     _.remove(facets, function (e) {
       return asArray(props.filter.datasetKey).indexOf(e.name) !== -1;
     });
     facets = facets.map(function (e) {
-      return <li key={e.name} onClick={() => props.updateFilter('datasetKey', e.name, 'ADD')}><DatasetTitle id={e.name} /> {e.count}</li>
+      return formatOption(e.name, e.count);
     });
     return (
       <div>
         <div className="filter">
           <div className="loader"></div>
           <div className="filter__content">
-            <h4>Datasets</h4>
-            <label>
-              Name:
-                <input type="text" value={this.state.value} onChange={this.handleChange} />
-            </label>
-            <button disabled={this.state.value === ''} onClick={() => this.props.updateFilter('datasetKey', this.state.value, 'ADD')}>addFilter</button>
-            <ul>
-              {datasets}
-            </ul>
-            <ul>
-              {facets}
-            </ul>
-          </div>
-        </div>
-        <div className="filter">
-          <div className="loader"></div>
-          <div className="filter__content">
             <div className="filter__header">
               <h3 className="ellipsis">Datasets</h3>
               <div>
-                <a>S</a>
-                <a>D</a>
+                <a><i className="material-icons u-secondaryTextColor">more_vert</i></a>
               </div>
             </div>
             <div className="filter__info">
-              <dl class="u-secondaryTextColor u-upperCase u-small">
-                <dt class="CDB-Widget-infoCount">1.302</dt><dd class="CDB-Widget-infoDescription">Datasets</dd>
-                <dt class="CDB-Widget-infoCount">26</dt><dd class="CDB-Widget-infoDescription">in view</dd>
+              <dl className="u-secondaryTextColor u-upperCase u-small">
+                <dt>1.302</dt><dd>Datasets</dd>
+                <dt>26</dt><dd>in view</dd>
               </dl>
             </div>
             <div className="filter__search">
-              <input placeholder="Search" />
+              <i className="material-icons u-secondaryTextColor">search</i>
+              <Suggest endpoint="https://api.gbif.org/v1/occurrence/search/institutionCode" onSelect={this.onSelect} value={this.state.value} />
             </div>
             <div className="filter__actions u-secondaryTextColor u-upperCase u-small">
-              <p>2 selected</p>
+              <p className="u-semibold">2 selected</p>
               <a>All</a>
             </div>
             <div className="filter__options">
               <ul>
-                <li>
-                </li>
+                {datasets}
+                {facets}
               </ul>
             </div>
           </div>

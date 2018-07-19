@@ -1,32 +1,6 @@
-/* .App {
-  text-align: center;
+* {
+  box-sizing: border-box;
 }
-
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
-}
-
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
-}
-
-.App-title {
-  font-size: 1.5em;
-}
-
-.App-intro {
-  font-size: large;
-}
-
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-} */
-
 
 body {
   background: #f2f6f9;
@@ -61,9 +35,6 @@ main {
   top: 0;
   bottom: 0;
   padding: 10px;
-}
-.navDrawer > section {
-  border-bottom: 1px solid #eee;
 }
 
 .viewSelector {
@@ -109,13 +80,25 @@ dd, dt {
   font-size: 10px;
   line-height: 14px;
 }
+.u-medium {
+  font-size: 12px;
+  line-height: 16px;
+}
+.u-semibold {
+  font-weight: 600;
+}
 
 /* filter */
 .filter {
   background: white;
+  margin-bottom: 6px;
+  border-radius: 3px;
+}
+.filter .material-icons {
+  font-size: 18px;
 }
 .filter__content {
-  
+  overflow: hidden;
 }
 .filter__header, .filter__info {
   margin-right: 24px;
@@ -144,11 +127,26 @@ dd, dt {
 .filter__search {
   border: 1px solid #eee;
   border-width: 1px 0;
+  position: relative;
+}
+.filter__search i {
+  position: absolute;
+  right: 24px;
+  top: 14px;
 }
 .filter__search input {
   border: none;
-  padding: 12px 24px;
+  display: block;
+  width: 100%;
+  padding: 12px 60px 12px 24px;
   font-size: 14px;
+  border: 1px solid transparent;
+  border-width: 1px 0;
+}
+.filter__search input:focus {
+  outline: none;
+  background: #fbfbfb;
+  border-bottom-color: deepskyblue;
 }
 
 .filter__actions {
@@ -159,6 +157,48 @@ dd, dt {
 }
 .filter__actions p, .filter__actions a {
   display: inline-block;
+}
+
+.filter__options ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  margin-bottom: 24px;
+}
+
+.filter__options input[type="checkbox"]{
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  visibility: hidden;
+}
+.filter__facet {
+  margin-right: 24px;
+  margin-left: 24px;
+  padding: 6px 0;
+}
+
+.filter__facet__title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+
+.percentageBar {
+  border-radius: 2px;
+  height: 4px;
+  background: #eee;
+}
+.percentageBar>div {
+  height: 4px;
+  border-radius: 2px;
+  width: 50%;
+  background: #9de0ad;
 }
 
 /*Loader*/
