@@ -54,7 +54,6 @@ class Suggest extends Component {
         <ReactAutocomplete
             wrapperStyle={{}}
             items={this.state.suggestions}
-            shouldItemRender={(item, value) => item.toLowerCase().indexOf(value.toLowerCase()) > -1}
             getItemValue={item => item}
             renderItem={(item, highlighted) =>
                 <div

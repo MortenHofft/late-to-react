@@ -107,6 +107,7 @@ dd, dt {
   background: white;
   margin-bottom: 6px;
   border-radius: 3px;
+  padding-bottom: 24px;
 }
 .filter .material-icons {
   font-size: 18px;
@@ -177,7 +178,6 @@ dd, dt {
   list-style: none;
   margin: 0;
   padding: 0;
-  margin-bottom: 24px;
 }
 
 .filter__options input[type="checkbox"]{
@@ -247,4 +247,28 @@ dd, dt {
     80% { left: 50%;}
     95% {left: 120%;}
     to {left: 100%;}
+}
+
+
+
+
+.chips {
+  margin: 0 -5px;
+  padding: 0;
+}
+.chips li {
+  margin: 5px;
+}
+.chip {
+  display: inline-block;
+}
+.chip span {
+  background: #ddd;
+  padding: 3px 5px;
+  border-radius: 0 3px 3px 0;
+}
+.chip span:first-of-type {
+  border: 1px solid #bbb;
+  border-width: 0 1px 0 0;
+  border-radius: 3px 0 0 3px;
 }

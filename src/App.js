@@ -28,11 +28,13 @@ class App extends Component {
     super(props);
     this.updateFilter = this.updateFilter.bind(this);
     this.filterFromUrl = this.filterFromUrl.bind(this);
-    const filter = queryString.parse(window.location.search);
+    const query = queryString.parse(window.location.search);
     this.state = {
-      filter: filter
+      filter: {
+        query: query
+      }
     };
-    this.state.filter.hash = objectHash(this.state.filter);
+    this.state.filter.hash = objectHash(this.state.filter.query);
 
     history.listen((location, action) => {
       this.filterFromUrl(location);
@@ -40,7 +42,7 @@ class App extends Component {
   }
 
   updateFilter(param, value, action) {
-    let paramValues = asArray(this.state.filter[param]);
+    let paramValues = asArray(this.state.filter.query[param]);
     if (action === 'CLEAR') {
       console.log('clear');
       paramValues = '';
@@ -53,19 +55,20 @@ class App extends Component {
     } else {
       paramValues = [value];
     }
-    let filter = _.merge({}, this.state.filter, {[param]: paramValues});
+    let filter = _.merge({}, this.state.filter.query, {[param]: paramValues});
     if (!paramValues) {
       delete filter[param];
     }
-    delete filter.hash;
     history.push(window.location.pathname + '?' + queryString.stringify(filter));
     // filter.hash = objectHash(filter);
     // this.setState({filter: filter});
   }
 
   filterFromUrl(location) {
-    const filter = queryString.parse(location.search);
-    filter.hash = objectHash(filter);
+    const filter = {};
+    const query = queryString.parse(location.search);
+    filter.hash = objectHash(query);
+    filter.query = query;
     this.setState({filter: filter});
   }
 
@@ -77,7 +80,7 @@ class App extends Component {
           <Filter filter={this.state.filter} updateFilter={this.updateFilter} />
           <main>
             <section>
-              <Summary filter={this.state.filter}/>
+              <Summary filter={this.state.filter} updateFilter={this.updateFilter} />
             </section>
             <section>
               <Switch>
@@ -89,6 +92,7 @@ class App extends Component {
               <ul className="viewSelector">
                 <li>
                   <Link to="/">Table</Link>
+                  <Link to={{ pathname: '/', search: queryString.stringify(this.state.filter.query) }}>Table query</Link>
                 </li>
                 <li>
                   <Link to="/gallery">Gallery</Link>

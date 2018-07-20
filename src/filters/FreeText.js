@@ -3,10 +3,11 @@ import _ from 'lodash';
 import queryString from 'query-string'
 import humanize from 'humanize-num'
 
-import Suggest from './Suggest'
+import {Suggest, speciesTemplate} from './SuggestKey'
 import If from './If'
+// import DatasetTitle from './DatasetTitle';
 
-import DatasetTitle from './DatasetTitle';
+console.log(speciesTemplate);
 
 function asArray(value) {
   if (_.isUndefined(value)) {
@@ -18,6 +19,9 @@ function asArray(value) {
   }
 }
 
+function identity(props) {
+  return <span>{props.id}</span>
+}
 class FreeText extends Component {
   constructor(props) {
     super(props);
@@ -27,7 +31,7 @@ class FreeText extends Component {
     this.formatOption = this.formatOption.bind(this);
     this.onSelect = this.onSelect.bind(this);
 
-    this.state = { value: '' };
+    this.state = _.merge({}, { value: '', expanded: true, displayName: identity }, this.props.options);
   }
 
   componentDidMount() {
@@ -46,7 +50,7 @@ class FreeText extends Component {
   }
 
   updateFacets() {
-    let filter = _.merge({}, this.props.filter, { limit: 0, facet: 'datasetKey' });
+    let filter = _.merge({}, this.props.filter.query, { limit: 0, facetLimit: 5, facet: this.props.options.field });
     delete filter.hash;
     let p1 = fetch('https://api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter));
     this.setState({loading: true});
@@ -95,13 +99,14 @@ class FreeText extends Component {
       <div className="percentageBar"><div style={width}></div></div>
     );
     
+    let Formater = this.state.displayName;
     return (
       <li key={id} className={active ? 'active' : 'disabled'}>
-        <label onClick={() => this.props.updateFilter('datasetKey', id, action)}>
+        <label onClick={() => this.props.updateFilter(this.props.options.field, id, action)}>
           <input type="checkbox" />
           <div className="filter__facet">
             <div className="filter__facet__title">
-              <div className="u-ellipsis u-semibold u-medium"><DatasetTitle id={id} /></div><If show={count > 0}><div className="u-secondaryTextColor u-small">{ humanize(count) }</div></If>
+              <div className="u-ellipsis u-semibold u-medium"><Formater id={id} /></div><If show={count > 0}><div className="u-secondaryTextColor u-small">{ humanize(count) }</div></If>
             </div>
             {progress}
           </div>
@@ -113,6 +118,7 @@ class FreeText extends Component {
   onSelect(val) {
     console.log('selected', val);
     this.setState({value: ''});
+    this.props.updateFilter(this.props.options.field, val, 'ADD')
   }
 
   render() {
@@ -122,7 +128,7 @@ class FreeText extends Component {
     let formatOption = this.formatOption;
     
     let facets = asArray(this.state.facets);
-    let datasets = asArray(this.props.filter.datasetKey);
+    let datasets = asArray(this.props.filter.query.datasetKey);
     if (facets.length > 0) {
       facets = _.keyBy(facets, 'name');
     }
@@ -131,12 +137,12 @@ class FreeText extends Component {
     });
     let multiFacets = asArray(this.state.multiFacets);
     _.remove(multiFacets, function (e) {
-      return asArray(props.filter.datasetKey).indexOf(e.name) !== -1;
+      return asArray(props.filter.query.datasetKey).indexOf(e.name) !== -1;
     });
     multiFacets = multiFacets.map(function (e) {
       return formatOption(e.name, e.count, total, 'ADD', datasets.length == 0);
     });
-    let selectedCount = asArray(this.props.filter.datasetKey).length;
+    let selectedCount = asArray(this.props.filter.query.datasetKey).length;
     
     return (
       <div>
@@ -146,7 +152,12 @@ class FreeText extends Component {
             <div className="filter__header">
               <h3 className="ellipsis">Datasets</h3>
               <div>
-                <a><i className="material-icons u-secondaryTextColor">more_vert</i></a>
+                <If show={this.state.expanded}>
+                  <a onClick={() => this.setState({expanded: false})}><i className="material-icons u-secondaryTextColor">expand_less</i></a>
+                </If>
+                <If show={!this.state.expanded}>
+                  <a onClick={() => this.setState({expanded: true})}><i className="material-icons u-secondaryTextColor">expand_more</i></a>
+                </If>
               </div>
             </div>
             <div className="filter__info">
@@ -155,23 +166,31 @@ class FreeText extends Component {
                 <dt>26</dt><dd>in view</dd>
               </dl>
             </div>
+            <If show={this.state.expanded}>
             <div className="filter__search">
               <i className="material-icons u-secondaryTextColor">search</i>
-              <Suggest endpoint="https://api.gbif.org/v1/occurrence/search/institutionCode" onSelect={this.onSelect} value={this.state.value} />
+              <Suggest  endpoint="https://api.gbif.org/v1/dataset/suggest" 
+                        onSelect={this.onSelect} value={this.state.value}
+                        itemKey="key"/>
             </div>
+            </If>
             <div className="filter__actions u-secondaryTextColor u-upperCase u-small">
               <If show={selectedCount > 0}>
                 <p className="u-semibold">{selectedCount} selected</p>
               </If>
-              <If show={selectedCount == 0}>
-                <p>&nbsp;</p>
+              <If show={selectedCount == 0 && this.state.expanded}>
+                <p>All selected</p>
               </If>
-              <button className="u-actionTextColor" onClick={() => this.props.updateFilter('datasetKey', null, 'CLEAR')}>All</button>
+              <If show={selectedCount > 0}>
+                <button className="u-actionTextColor" onClick={() => this.props.updateFilter(this.props.options.field, null, 'CLEAR')}>All</button>
+              </If>
             </div>
             <div className="filter__options">
               <ul>
                 {datasets}
-                {multiFacets}
+                <If show={this.state.expanded}>
+                  {multiFacets}
+                </If>
               </ul>
             </div>
           </div>

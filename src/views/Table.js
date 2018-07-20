@@ -29,7 +29,7 @@ class Table extends Component {
   }
 
   updateResults() {
-    let filter = _.merge({}, this.props.filter, this.state.page);
+    let filter = _.merge({}, this.props.filter.query, this.state.page);
     fetch('https://api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter))
       .then(res => res.json())
       .then(
@@ -67,7 +67,7 @@ class Table extends Component {
         <button onClick={() => this.nextPage()}>next</button>
         <div>
           <span>Filter</span>
-          {JSON.stringify(this.props.filter, null, 2)}
+          {JSON.stringify(this.props.filter.query, null, 2)}
           {JSON.stringify(this.state.page , null, 2)}
         </div>
       </div>

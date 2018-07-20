@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 
 import FreeText from './filters/FreeText';
+import DatasetTitle from './filters/DatasetTitle';
+import SpeciesTitle from './filters/SpeciesTitle';
 
 class Filter extends Component {
   constructor(props) {
@@ -14,7 +16,8 @@ class Filter extends Component {
             <h4>Filters</h4>
           </section>
           <section>
-            <FreeText filter={this.props.filter} updateFilter={this.props.updateFilter} />
+            <FreeText filter={this.props.filter} updateFilter={this.props.updateFilter} options={{field: 'datasetKey', displayName: DatasetTitle}}/>
+            <FreeText filter={this.props.filter} updateFilter={this.props.updateFilter} options={{field: 'taxonKey', displayName: SpeciesTitle}}/>
           </section>
         </div>
     );

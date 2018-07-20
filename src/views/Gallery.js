@@ -26,7 +26,7 @@ class Gallery extends Component {
   }
 
   updateResults() {
-    let filter = _.merge({}, this.props.filter, {media_type: 'StillImage', limit: 3});
+    let filter = _.merge({}, this.props.filter.query, {media_type: 'StillImage', limit: 3});
     fetch('https://api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter))
       .then(res => res.json())
       .then(
@@ -54,7 +54,7 @@ class Gallery extends Component {
         <h4>Gallery component</h4>
         <div>
           <span>Filter</span>
-          {JSON.stringify(this.props.filter, null, 2)}
+          {JSON.stringify(this.props.filter.query, null, 2)}
         </div>
         <ul>{listItems}</ul>
       </div>
