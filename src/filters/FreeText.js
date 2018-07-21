@@ -50,37 +50,47 @@ class FreeText extends Component {
   }
 
   updateFacets() {
+    let promises = [];
     let filter = _.merge({}, this.props.filter.query, { limit: 0, facetLimit: 5, facet: this.props.options.field });
     delete filter.hash;
-    let p1 = fetch('https://api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter));
-    this.setState({loading: true});
-    p1.then(res => res.json())
-      .then(
-        (result) => {
-          this.setState({ facets: result.facets[0].counts, count: result.count });
-        },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
-        (error) => {
-          this.setState({ error: true });
-        }
-      )
-    filter.datasetKey = undefined;
-    let p2 = fetch('https://api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter));
-    p2.then(res => res.json())
-      .then(
-        (result) => {
-          this.setState({ multiFacets: result.facets[0].counts, total: result.count });
-        },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
-        (error) => {
-          this.setState({ error: true });
-        }
-      );
-    Promise.all([p1, p2])
+
+    if (this.props.filter.query[this.props.options.field]) {
+      let p1 = fetch('https://api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter));
+      promises.push(p1);
+      this.setState({loading: true});
+      p1.then(res => res.json())
+        .then(
+          (result) => {
+            this.setState({ facets: result.facets[0].counts, count: result.count });
+          },
+          // Note: it's important to handle errors here
+          // instead of a catch() block so that we don't swallow
+          // exceptions from actual bugs in components.
+          (error) => {
+            this.setState({ error: true });
+          }
+        )
+    }
+
+
+    if (this.props.options.showSuggestions) {
+      filter[this.props.options.field] = undefined;
+      let p2 = fetch('https://api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter));
+      p2.then(res => res.json())
+        .then(
+          (result) => {
+            this.setState({ multiFacets: result.facets[0].counts, total: result.count });
+          },
+          // Note: it's important to handle errors here
+          // instead of a catch() block so that we don't swallow
+          // exceptions from actual bugs in components.
+          (error) => {
+            this.setState({ error: true });
+          }
+        );
+      promises.push(p2);
+    }
+    Promise.all(promises)
       .then(() => {this.setState({loading: false})})
       .catch(() => {this.setState({loading: false})});
   }
@@ -128,21 +138,21 @@ class FreeText extends Component {
     let formatOption = this.formatOption;
     
     let facets = asArray(this.state.facets);
-    let datasets = asArray(this.props.filter.query.datasetKey);
+    let selectedValues = asArray(this.props.filter.query[this.props.options.field]);
     if (facets.length > 0) {
       facets = _.keyBy(facets, 'name');
     }
-    datasets = datasets.map(function (e) {
+    selectedValues = selectedValues.map(function (e) {
       return formatOption(e, _.get(facets, e + '.count'), count, 'REMOVE', true);
     });
     let multiFacets = asArray(this.state.multiFacets);
     _.remove(multiFacets, function (e) {
-      return asArray(props.filter.query.datasetKey).indexOf(e.name) !== -1;
+      return asArray(props.filter.query[props.options.field]).indexOf(e.name) !== -1;
     });
     multiFacets = multiFacets.map(function (e) {
-      return formatOption(e.name, e.count, total, 'ADD', datasets.length == 0);
+      return formatOption(e.name, e.count, total, 'ADD', selectedValues.length == 0);
     });
-    let selectedCount = asArray(this.props.filter.query.datasetKey).length;
+    let selectedCount = asArray(this.props.filter.query[this.props.options.field]).length;
     
     return (
       <div>
@@ -150,7 +160,7 @@ class FreeText extends Component {
           <If show={this.state.loading}><div className="loader"></div></If>
           <div className="filter__content">
             <div className="filter__header">
-              <h3 className="ellipsis">Datasets</h3>
+              <h3 className="ellipsis">{this.props.options.field}</h3>
               <div>
                 <If show={this.state.expanded}>
                   <a onClick={() => this.setState({expanded: false})}><i className="material-icons u-secondaryTextColor">expand_less</i></a>
@@ -169,9 +179,12 @@ class FreeText extends Component {
             <If show={this.state.expanded}>
             <div className="filter__search">
               <i className="material-icons u-secondaryTextColor">search</i>
-              <Suggest  endpoint="https://api.gbif.org/v1/dataset/suggest" 
+              <Suggest  endpoint={this.props.options.autoComplete.endpoint} 
                         onSelect={this.onSelect} value={this.state.value}
-                        itemKey="key"/>
+                        itemKey={this.props.options.autoComplete.key}
+                        itemTitle={this.props.options.autoComplete.title}
+                        renderItem={this.props.options.autoComplete.renderItem}
+                        />
             </div>
             </If>
             <div className="filter__actions u-secondaryTextColor u-upperCase u-small">
@@ -187,8 +200,8 @@ class FreeText extends Component {
             </div>
             <div className="filter__options">
               <ul>
-                {datasets}
-                <If show={this.state.expanded}>
+                {selectedValues}
+                <If show={this.state.expanded && this.props.options.showSuggestions}>
                   {multiFacets}
                 </If>
               </ul>

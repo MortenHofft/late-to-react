@@ -1,8 +1,10 @@
 import React from 'react';
 import _ from 'lodash';
+import displayName from './filters/fieldFormats';
 
 function getListItem(param, value, index, cb) {
-    return <li key={index} className="chip" onClick={() => cb(param, value, 'REMOVE')}><span>{param}</span><span>{value}</span></li>
+    let DisplayName = displayName(param);
+    return <li key={index} className="chip" onClick={() => cb(param, value, 'REMOVE')}><span>{param}</span><DisplayName id={value} /></li>
 }
 function Summary(props) {
     const style = {padding: '10px'};
@@ -19,7 +21,7 @@ function Summary(props) {
     });
     const element = (
         <div style={style}>
-            <h4>Count: {filters.length}</h4>
+            <h4>Filters: {filters.length}</h4>
             <ul className="chips">
                 {filters}
             </ul>

@@ -66,13 +66,15 @@ class Suggest extends Component {
   }
 
   render() {
-    let titleField = this.props.itemTitle || 'title';
-    let keyField = this.props.itemKey || 'key';
+    let keyField = this.props.itemKey;
+    let titleField = keyField ? this.props.itemTitle || 'title' : undefined;
     let getItemValue = this.props.itemKey ? item => '' + item[keyField] : item => '' + item;
     let renderItem = function(item, highlighted) {
+      let key = getItemValue(item);
+      let title = keyField ? item[titleField] : item;
       return (
-      <div key={item.key} style={{ backgroundColor: highlighted ? '#eee' : 'transparent'}}>
-        {item[titleField]}
+      <div key={key} style={{ backgroundColor: highlighted ? '#eee' : 'transparent'}}>
+        {title}
       </div>
       )};
     renderItem = this.props.renderItem ? this.props.renderItem : renderItem;

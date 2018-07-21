@@ -91,14 +91,13 @@ class App extends Component {
               </Switch>
               <ul className="viewSelector">
                 <li>
-                  <Link to="/">Table</Link>
-                  <Link to={{ pathname: '/', search: queryString.stringify(this.state.filter.query) }}>Table query</Link>
+                  <Link to={{ pathname: '/', search: queryString.stringify(this.state.filter.query) }}>Table</Link>
                 </li>
                 <li>
-                  <Link to="/gallery">Gallery</Link>
+                  <Link to={{ pathname: '/gallery', search: queryString.stringify(this.state.filter.query) }}>Gallery</Link>
                 </li>
                 <li>
-                  <Link to="/split">Split</Link>
+                <Link to={{ pathname: '/split', search: queryString.stringify(this.state.filter.query) }}>Split</Link>
                 </li>
               </ul>
             </section>
