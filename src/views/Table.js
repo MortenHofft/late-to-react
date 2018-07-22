@@ -21,13 +21,49 @@ class Table extends Component {
           width: 200
         },
         {
+          name: 'country',
+          width: 100
+        },
+        {
+          name: 'basisOfRecord',
+          width: 100
+        },
+        {
           name: 'datasetKey',
           width: 200
         },
         {
           name: 'year',
           width: 100
-        }
+        },
+        {
+          name: 'kingdom',
+          width: 100
+        },
+        {
+          name: 'phylum',
+          width: 100
+        },
+        {
+          name: 'class',
+          width: 100
+        },
+        {
+          name: 'order',
+          width: 100
+        },
+        {
+          name: 'family',
+          width: 100
+        },
+        {
+          name: 'genus',
+          width: 100
+        },
+        {
+          name: 'species',
+          width: 100
+        },
       ]
     };
     this.state = {
@@ -85,13 +121,14 @@ class Table extends Component {
   getRow(item) {
     return this.fieldConfig.fields.map(function(field){
       let DisplayName = displayName(field.name);
-      return <th key={field.name}><DisplayName id={item[field.name]} /></th>;
+      return <td key={field.name}><DisplayName id={item[field.name]} /></td>;
     });
   }
 
   bodyScroll() {
     console.log(5);
-    document.getElementById('headerdiv').scrollLeft = document.getElementById('bodyTable').scrollLeft
+    // document.getElementById('headerdiv').scrollLeft = document.getElementById('bodyTable').scrollLeft
+    this.setState({scrolled: document.getElementById('table').scrollLeft !== 0});
   }
 
   render() {
@@ -103,18 +140,17 @@ class Table extends Component {
     });
     let headers = this.getHeaders();
 
+    let scrolled = this.state.scrolled ? 'scrolled' : '';
     return (
       <div>
         <div>
-        <table>
-            <thead id="headerdiv">
+          <table id="table" className={scrolled} onScroll={ this.bodyScroll }>
+            <thead>
               <tr>
                 {headers}
               </tr>
             </thead>
-          </table>
-          <table>
-            <tbody id="bodyTable" onScroll={ this.bodyScroll }>
+            <tbody>
               {tbody}
             </tbody>
           </table>
