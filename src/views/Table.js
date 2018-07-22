@@ -2,13 +2,36 @@ import React, { Component } from 'react';
 import queryString from 'query-string'
 import _ from 'lodash';
 
+import displayName from '../filters/fieldFormats';
+
+require('./table.css');
+
 class Table extends Component {
   constructor(props) {
     super(props);
     this.updateFilter = this.updateFilter.bind(this);
     this.updateResults = this.updateResults.bind(this);
+    this.getHeaders = this.getHeaders.bind(this);
+    this.getRow = this.getRow.bind(this);
+    this.bodyScroll = this.bodyScroll.bind(this);
+    this.fieldConfig = {
+      fields: [
+        {
+          name: 'scientificName',
+          width: 200
+        },
+        {
+          name: 'datasetKey',
+          width: 200
+        },
+        {
+          name: 'year',
+          width: 100
+        }
+      ]
+    };
     this.state = {
-      page: {limit: 5, offset: 0},
+      page: {limit: 50, offset: 0},
       occurrences: []
     }
   }
@@ -34,7 +57,7 @@ class Table extends Component {
       .then(res => res.json())
       .then(
         (result) => {
-            this.setState({occurrences: result.results.map((e) => (e.scientificName))});
+            this.setState({occurrences: result.results});
         },
         // Note: it's important to handle errors here
         // instead of a catch() block so that we don't swallow
@@ -53,17 +76,49 @@ class Table extends Component {
     this.props.updateFilter(key, value);
   }
 
+  getHeaders() {
+    return this.fieldConfig.fields.map(function(field){
+      return <th key={field.name}><span>{field.name}</span></th>;
+    });
+  }
+
+  getRow(item) {
+    return this.fieldConfig.fields.map(function(field){
+      let DisplayName = displayName(field.name);
+      return <th key={field.name}><DisplayName id={item[field.name]} /></th>;
+    });
+  }
+
+  bodyScroll() {
+    console.log(5);
+    document.getElementById('headerdiv').scrollLeft = document.getElementById('bodyTable').scrollLeft
+  }
+
   render() {
-    const listItems = this.state.occurrences.map(function(e, i){
+    let getRow = this.getRow;
+    const tbody = this.state.occurrences.map(function(e, i){
       return (
-        <li key={i}>{e}</li>
+        <tr key={i}>{getRow(e)}</tr>
       );
     });
+    let headers = this.getHeaders();
 
     return (
       <div>
-        <h4>Table component</h4>
-        <ul>{listItems}</ul>
+        <div>
+        <table>
+            <thead id="headerdiv">
+              <tr>
+                {headers}
+              </tr>
+            </thead>
+          </table>
+          <table>
+            <tbody id="bodyTable" onScroll={ this.bodyScroll }>
+              {tbody}
+            </tbody>
+          </table>
+        </div>
         <button onClick={() => this.nextPage()}>next</button>
         <div>
           <span>Filter</span>

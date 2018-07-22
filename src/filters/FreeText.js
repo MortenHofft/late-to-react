@@ -90,6 +90,7 @@ class FreeText extends Component {
         );
       promises.push(p2);
     }
+
     Promise.all(promises)
       .then(() => {this.setState({loading: false})})
       .catch(() => {this.setState({loading: false})});
@@ -154,6 +155,20 @@ class FreeText extends Component {
     });
     let selectedCount = asArray(this.props.filter.query[this.props.options.field]).length;
     
+    let searchBlock = '';
+    if (this.state.expanded && this.props.options.search !== false) {
+      searchBlock = (
+        <div className="filter__search">
+          <i className="material-icons u-secondaryTextColor">search</i>
+          <Suggest  endpoint={this.props.options.autoComplete.endpoint} 
+                    onSelect={this.onSelect} value={this.state.value}
+                    itemKey={this.props.options.autoComplete.key}
+                    itemTitle={this.props.options.autoComplete.title}
+                    renderItem={this.props.options.autoComplete.renderItem}
+                    />
+        </div>
+      );
+    }
     return (
       <div>
         <div className="filter">
@@ -176,17 +191,7 @@ class FreeText extends Component {
                 <dt>26</dt><dd>in view</dd>
               </dl>
             </div>
-            <If show={this.state.expanded}>
-            <div className="filter__search">
-              <i className="material-icons u-secondaryTextColor">search</i>
-              <Suggest  endpoint={this.props.options.autoComplete.endpoint} 
-                        onSelect={this.onSelect} value={this.state.value}
-                        itemKey={this.props.options.autoComplete.key}
-                        itemTitle={this.props.options.autoComplete.title}
-                        renderItem={this.props.options.autoComplete.renderItem}
-                        />
-            </div>
-            </If>
+            {searchBlock}
             <div className="filter__actions u-secondaryTextColor u-upperCase u-small">
               <If show={selectedCount > 0}>
                 <p className="u-semibold">{selectedCount} selected</p>

@@ -1,0 +1,29 @@
+thead {
+    display: block;
+    width: 500px;
+    overflow: auto;
+    background: #ddd;
+}
+
+th, td {
+    padding: .5em 1em;
+    text-align: left;
+    width: 300px;
+    vertical-align: top;
+    border-left: 1px solid #fff;
+}
+th span, td span {
+    display: block;
+    width: 300px;
+}
+
+tbody {
+    display: block;
+    width: 500px;
+    height: 200px;
+    overflow: auto;
+}
+
+thead {
+    
+}

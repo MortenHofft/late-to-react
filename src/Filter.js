@@ -16,7 +16,8 @@ class Filter extends Component {
     return (
         <div className="navDrawer">
           <section>
-          <FreeText filter={this.props.filter} updateFilter={this.props.updateFilter} options={{field: 'taxonKey', displayName: displayName('taxonKey'), showSuggestions: false, autoComplete: {endpoint: 'https://api.gbif.org/v1/species/suggest', key: 'key', renderItem: speciesTemplate}}}/>
+            <FreeText filter={this.props.filter} updateFilter={this.props.updateFilter} options={{field: 'basisOfRecord', displayName: displayName('basisOfRecord'), showSuggestions: true, search: false }}/>
+            <FreeText filter={this.props.filter} updateFilter={this.props.updateFilter} options={{field: 'taxonKey', displayName: displayName('taxonKey'), showSuggestions: false, autoComplete: {endpoint: 'https://api.gbif.org/v1/species/suggest', key: 'key', renderItem: speciesTemplate}}}/>
             <FreeText filter={this.props.filter} updateFilter={this.props.updateFilter} options={{field: 'datasetKey', displayName: displayName('datasetKey'), showSuggestions: true, autoComplete: {endpoint: 'https://api.gbif.org/v1/dataset/suggest', key: 'key'}}}/>
             <FreeText filter={this.props.filter} updateFilter={this.props.updateFilter} options={{field: 'publishingOrg', displayName: displayName('publishingOrg'), showSuggestions: true, autoComplete: {endpoint: 'https://api.gbif.org/v1/organization/suggest', key: 'key'}}}/>
             <FreeText filter={this.props.filter} updateFilter={this.props.updateFilter} options={{field: 'institutionCode', displayName: displayName('institutionCode'), showSuggestions: true, autoComplete: {endpoint: 'https://api.gbif.org/v1/occurrence/search/institutionCode'}}}/>
@@ -31,11 +32,8 @@ export default Filter;
 
 /*
 
-<FreeText filter={this.props.filter} updateFilter={this.props.updateFilter} options={{field: 'datasetKey', displayName: DatasetTitle}}/>
-<FreeText filter={this.props.filter} updateFilter={this.props.updateFilter} options={{field: 'taxonKey', displayName: SpeciesTitle, suggest: {endpoint: 'https://api.gbif.org/v1/species/suggest', renderItem: speciesTemplate}}}/>
 
-  <pre>{JSON.stringify(this.props.filter, null, 2)}</pre>
-  <button onClick={() => this.props.updateFilter('datasetKey', '84d26682-f762-11e1-a439-00145eb45e9a')}>update filter to Fungal records</button>
+
 */
 
 /*
