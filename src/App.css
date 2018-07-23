@@ -39,9 +39,9 @@ main {
 
 .navDrawer {
   width: 350px;
-  overflow: auto;
+  /* overflow: auto; */
   height: 100%;
-  position: fixed;
+  position: absolute;
   right: 0;
   top: 0;
   bottom: 0;
@@ -51,9 +51,13 @@ main {
 .viewSelector {
   display: inline-block;
   position: absolute;
-  right: 20px;
-  bottom: 20px;
+  right: 420px;
+  top: 20px;
   list-style: none;
+  background: white;
+  padding: 0;
+  border: 1px solid #ddd;
+  border-radius: 3px;
 }
 
 .viewSelector li {

@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import queryString from 'query-string'
 import _ from 'lodash';
 
+import GalleryImg from './GalleryImg';
+
 class Gallery extends Component {
   constructor(props) {
     super(props);
@@ -44,7 +46,7 @@ class Gallery extends Component {
     const listItems = this.state.occurrences.map(function(e, i){
       return (
         <li key={i} style={styleItem}>
-          <img src={e.media[0].identifier} width="100" />
+          <GalleryImg src={e.media[0].identifier} />
         </li>
       );
     });
