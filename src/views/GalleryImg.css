@@ -1,0 +1,14 @@
+.imageGallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-left: vrBlock(-0.5);
+}
+
+.imageGallery a {
+    background: #eee;
+    display: block;
+    flex: 1 1 auto;
+    position: relative;
+    width $mobileGalleryHeight //asummed square
+}
