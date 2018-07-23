@@ -1,6 +1,8 @@
 import React from 'react';
 import _ from 'lodash';
+
 import displayName from './filters/fieldFormats';
+import SearchBar from './filters/searchBar/SearchBar';
 
 function getListItem(param, value, index, cb) {
     let DisplayName = displayName(param);
@@ -25,6 +27,7 @@ function Summary(props) {
             <ul className="chips">
                 {filters}
             </ul>
+            <SearchBar />
         </div>
     );
     return element;

@@ -1,0 +1,25 @@
+.searchBar {
+    border: 1px solid deepskyblue;
+    input {
+        display: block;
+        width: 100%;
+        padding: 10px;
+    }
+}
+
+.searchBarSuggest {
+    > div {
+        > div {
+            display: flex;
+            flex-direction: row;
+            border-bottom: 1px solid #e5ebed;
+            > div {
+                flex: 1 0 66%;
+                padding: 18px;
+                &:first-of-type {
+                    flex: 1 0 33%;
+                }
+            }
+        }
+    }
+}

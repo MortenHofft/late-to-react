@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import queryString from 'query-string'
-import _ from 'lodash';
+
+require('./GalleryImg.css');
+
 const thinner = 0.6,
     thin = 0.8,
     wide = 1.4,
@@ -30,16 +31,16 @@ class GalleryImg extends Component {
 //   }
 
     onLoad(event) {
-        console.log(event.target);
+        let element = event.target;
         this.setState({backgroundImg: this.props.src});
 
-        /*var ratio = (element[0].naturalWidth) / element[0].naturalHeight;
-        if (ratio > widest) element.parent().attr('data-width', 'widest');
+        var ratio = (element.naturalWidth) / element.naturalHeight;
+        if (ratio > widest) this.setState({width: 'widest'});
         else if (ratio > wider && ratio <= widest) this.setState({width: 'wider'});
         else if (ratio > wide && ratio <= wider) this.setState({width: 'wide'});
-        else if (ratio > thinner && ratio <= thin) this.setState({width: 'this'});
+        else if (ratio > thinner && ratio <= thin) this.setState({width: 'thin'});
         else if (ratio <= thinner) this.setState({width: 'thinner'});
-        this.setState({valid: true});*/
+        this.setState({valid: true});
     }
 
     render() {
@@ -50,7 +51,7 @@ class GalleryImg extends Component {
         }
 
         return (
-            <a href="" style={styleItem}>
+            <a href="" style={styleItem} data-width={this.state.width}>
                 <img src={this.props.src} width="100" onLoad={this.onLoad} />
             </a>
         );

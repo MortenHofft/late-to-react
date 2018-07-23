@@ -126,8 +126,6 @@ class Table extends Component {
   }
 
   bodyScroll() {
-    console.log(5);
-    // document.getElementById('headerdiv').scrollLeft = document.getElementById('bodyTable').scrollLeft
     this.setState({scrolled: document.getElementById('table').scrollLeft !== 0});
   }
 

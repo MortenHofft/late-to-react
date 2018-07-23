@@ -28,7 +28,7 @@ class Gallery extends Component {
   }
 
   updateResults() {
-    let filter = _.merge({}, this.props.filter.query, {media_type: 'StillImage', limit: 3});
+    let filter = _.merge({}, this.props.filter.query, {media_type: 'StillImage', limit: 50});
     fetch('https://api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter))
       .then(res => res.json())
       .then(
@@ -45,20 +45,17 @@ class Gallery extends Component {
     const styleItem = {display: 'inline-block'};
     const listItems = this.state.occurrences.map(function(e, i){
       return (
-        <li key={i} style={styleItem}>
-          <GalleryImg src={e.media[0].identifier} />
-        </li>
+        <GalleryImg key={i} src={e.media[0].identifier} />
       );
     });
 
     return (
       <div>
-        <h4>Gallery component</h4>
-        <div>
-          <span>Filter</span>
-          {JSON.stringify(this.props.filter.query, null, 2)}
+        <div className="imageGallery">
+          {listItems}
+          <div className="imageGallery__more p-hidden" ng-click="occGallery.loadMore()" ng-if="!occGallery.endOfRecords"><span>Load more</span></div>
+          <div className="imageGallery__more imageGallery__more__filler" ng-if="occGallery.endOfRecords"></div>
         </div>
-        <ul>{listItems}</ul>
       </div>
     );
   }
