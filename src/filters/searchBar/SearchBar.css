@@ -1,6 +1,10 @@
 .searchBar {
-  border: 1px solid deepskyblue; }
+  border: 1px solid deepskyblue;
+  position: relative;
+  height: 40px;
+  z-index: 50; }
   .searchBar input {
+    height: 40px;
     display: block;
     width: 100%;
     padding: 10px; }
@@ -9,8 +13,22 @@
   display: flex;
   flex-direction: row;
   border-bottom: 1px solid #e5ebed; }
+  .searchBarSuggest > div > div.disabled {
+    background-color: #eee;
+    color: #8091a5;
+    font-weight: bold; }
+    .searchBarSuggest > div > div.disabled > div {
+      padding: 12px 18px; }
   .searchBarSuggest > div > div > div {
-    flex: 1 0 66%;
+    flex: 1 0 50%;
     padding: 18px; }
-    .searchBarSuggest > div > div > div:first-of-type {
-      flex: 1 0 33%; }
+  .searchBarSuggest > div > div .fieldName {
+    background: #e2e7ea;
+    padding: 5px;
+    color: #8091a5;
+    border: 1px solid #91a3b8;
+    font-weight: bold; }
+  .searchBarSuggest > div > div .fieldValue {
+    font-weight: bold; }
+  .searchBarSuggest > div > div .fieldDescription {
+    color: #7e878c; }

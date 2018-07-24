@@ -50,7 +50,8 @@ main {
 
 .viewSelector {
   display: inline-block;
-  position: absolute;
+  margin-top: 0;
+  display: flex;
   right: 420px;
   top: 20px;
   list-style: none;
@@ -60,13 +61,12 @@ main {
   border-radius: 3px;
   li {
     background: deepskyblue;
+    flex: 1 1 auto;
+    text-align: center;
+    padding: 10px;
   }
 }
 
-.viewSelector li {
-  display: inline-block;
-  padding: 10px;
-}
 .viewSelector li a {
   text-decoration: none;
   color: inherit;
@@ -262,12 +262,15 @@ dd, dt {
 .chips {
   margin: 0 -5px;
   padding: 0;
+  padding-top: 10px;
 }
 .chips li {
   margin: 5px;
 }
 .chip {
   display: inline-block;
+  font-size: 12px;
+  font-weight: bold;
 }
 .chip span {
   background: #ddd;
@@ -278,4 +281,5 @@ dd, dt {
   border: 1px solid #bbb;
   border-width: 0 1px 0 0;
   border-radius: 3px 0 0 3px;
+  color: #6f6f6f;
 }

@@ -27,7 +27,7 @@ tbody {
 table {
     display: grid; /* This is a (hacky) way to make the .grid element size to fit its content */
     overflow: auto;
-    height: calc(100vh - 350px);
+    max-height: calc(100vh - 350px);
     width: 100%;
     border-spacing: 0;
     border-collapse: separate;
@@ -39,7 +39,7 @@ thead {
     position: sticky;
     top: 0;
     display: block;
-    z-index: 100;
+    z-index: 20;
     border-bottom: 2px solid #ddd;
     color: #8091a5;
 }
@@ -58,7 +58,7 @@ th, td {
 th:first-of-type, td:first-of-type {
     position: sticky;
     left: 0;
-    z-index: 50;
+    z-index: 10;
     border-right: 1px solid transparent;
     transition: border-color 200ms ease;
 }

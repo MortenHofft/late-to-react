@@ -23,11 +23,10 @@ function Summary(props) {
     });
     const element = (
         <div style={style}>
-            <h4>Filters: {filters.length}</h4>
+            <SearchBar updateFilter={props.updateFilter}/>
             <ul className="chips">
                 {filters}
             </ul>
-            <SearchBar />
         </div>
     );
     return element;

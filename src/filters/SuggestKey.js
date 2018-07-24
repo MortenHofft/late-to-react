@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import _ from 'lodash';
 import axios from 'axios';
 import queryString from 'query-string';
 import ReactAutocomplete from 'react-autocomplete';
@@ -28,7 +27,7 @@ class Suggest extends Component {
 
   getSuggestions(searchText) {
     //first of - cancel pending requests for suggestions
-    if (cancel != undefined) {
+    if (cancel !== undefined) {
       cancel();
     }
     //construct search query

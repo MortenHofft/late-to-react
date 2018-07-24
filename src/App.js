@@ -83,12 +83,6 @@ class App extends Component {
               <Summary filter={this.state.filter} updateFilter={this.updateFilter} />
             </section>
             <section>
-              <Switch>
-                <Route exact path="/" render={(props) => <Table filter={this.state.filter} updateFilter={this.updateFilter} />} />
-                <Route path="/gallery" render={(props) => <Gallery filter={this.state.filter} updateFilter={this.updateFilter} />} />
-                <Route path="/split" render={(props) => <Split filter={this.state.filter} updateFilter={this.updateFilter} />} />
-                <Route component={NoMatch} />
-              </Switch>
               <ul className="viewSelector">
                 <li>
                   <Link to={{ pathname: '/', search: queryString.stringify(this.state.filter.query) }}>Table</Link>
@@ -100,6 +94,12 @@ class App extends Component {
                 <Link to={{ pathname: '/split', search: queryString.stringify(this.state.filter.query) }}>Split</Link>
                 </li>
               </ul>
+              <Switch>
+                <Route exact path="/" render={(props) => <Table filter={this.state.filter} updateFilter={this.updateFilter} />} />
+                <Route path="/gallery" render={(props) => <Gallery filter={this.state.filter} updateFilter={this.updateFilter} />} />
+                <Route path="/split" render={(props) => <Split filter={this.state.filter} updateFilter={this.updateFilter} />} />
+                <Route component={NoMatch} />
+              </Switch>
             </section>
           </main>
         </div>

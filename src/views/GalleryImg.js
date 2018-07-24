@@ -32,7 +32,7 @@ class GalleryImg extends Component {
 
     onLoad(event) {
         let element = event.target;
-        this.setState({backgroundImg: this.props.src});
+        this.setState({backgroundImg: '//api.gbif.org/v1/image/unsafe/x260/' + encodeURIComponent(this.props.src) });
 
         var ratio = (element.naturalWidth) / element.naturalHeight;
         if (ratio > widest) this.setState({width: 'widest'});
@@ -45,14 +45,10 @@ class GalleryImg extends Component {
 
     render() {
         let styleItem = {backgroundImage: 'url(' + this.state.backgroundImg + ')'};
-        let imgStyle = {visibility: 'hidden'};
-        if (this.state.backgroundImg) {
-
-        }
 
         return (
             <a href="" style={styleItem} data-width={this.state.width}>
-                <img src={this.props.src} width="100" onLoad={this.onLoad} />
+                <img src={'//api.gbif.org/v1/image/unsafe/x260/' + encodeURIComponent(this.props.src) } width="100" onLoad={this.onLoad} alt="Occurrence evidence"/>
             </a>
         );
     }

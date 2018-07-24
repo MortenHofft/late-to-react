@@ -11,7 +11,6 @@ class PublisherTitle extends Component {
 
   componentDidMount() {
     this.getTitle();
-    // OccurrenceStore.on('change', this.getOccurrences);
   }
 
   componentWillUnmount() {
@@ -19,7 +18,7 @@ class PublisherTitle extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.id !== this.props.id) {
+    if (prevProps.id !== this.props.id) {
       this.getTitle();
     }
   }

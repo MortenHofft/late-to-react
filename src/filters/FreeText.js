@@ -3,11 +3,8 @@ import _ from 'lodash';
 import queryString from 'query-string'
 import humanize from 'humanize-num'
 
-import {Suggest, speciesTemplate} from './SuggestKey'
+import Suggest from './SuggestKey'
 import If from './If'
-// import DatasetTitle from './DatasetTitle';
-
-console.log(speciesTemplate);
 
 function asArray(value) {
   if (_.isUndefined(value)) {
@@ -151,7 +148,7 @@ class FreeText extends Component {
       return asArray(props.filter.query[props.options.field]).indexOf(e.name) !== -1;
     });
     multiFacets = multiFacets.map(function (e) {
-      return formatOption(e.name, e.count, total, 'ADD', selectedValues.length == 0);
+      return formatOption(e.name, e.count, total, 'ADD', selectedValues.length === 0);
     });
     let selectedCount = asArray(this.props.filter.query[this.props.options.field]).length;
     
@@ -196,7 +193,7 @@ class FreeText extends Component {
               <If show={selectedCount > 0}>
                 <p className="u-semibold">{selectedCount} selected</p>
               </If>
-              <If show={selectedCount == 0 && this.state.expanded}>
+              <If show={selectedCount === 0 && this.state.expanded}>
                 <p>All selected</p>
               </If>
               <If show={selectedCount > 0}>

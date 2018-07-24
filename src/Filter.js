@@ -1,17 +1,12 @@
 import React, { Component } from 'react';
+import { Link } from "react-router-dom";
+import queryString from 'query-string'
 
 import FreeText from './filters/FreeText';
-import DatasetTitle from './filters/DatasetTitle';
-import SpeciesTitle from './filters/SpeciesTitle';
-import PublisherTitle from './filters/PublisherTitle';
 import displayName from './filters/fieldFormats';
 import { speciesTemplate } from './filters/SuggestKey';
 
 class Filter extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     return (
         <div className="navDrawer">
@@ -28,14 +23,3 @@ class Filter extends Component {
 }
 
 export default Filter;
-
-
-/*
-
-
-
-*/
-
-/*
-list: all option, search option, pagination, counts, negation?
-*/

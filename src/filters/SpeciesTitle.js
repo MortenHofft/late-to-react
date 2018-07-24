@@ -11,7 +11,6 @@ class SpeciesTitle extends Component {
 
   componentDidMount() {
     this.getTitle();
-    // OccurrenceStore.on('change', this.getOccurrences);
   }
 
   componentWillUnmount() {
@@ -19,7 +18,7 @@ class SpeciesTitle extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.id !== this.props.id) {
+    if (prevProps.id !== this.props.id) {
       this.getTitle();
     }
   }

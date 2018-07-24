@@ -1,29 +1,28 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
-import axios from 'axios';
-import queryString from 'query-string';
 import ReactAutocomplete from 'react-autocomplete';
+
+import MultiSuggest from './MultiSuggest';
 
 require('./SearchBar.css');
 
-const suggestions = [
+const ARROW_DOWN_KEY = 40;
+const ARROW_UP_KEY = 37;
+const ESCAPE_KEY = 27;
+const ENTER_KEY = 13;
+
+const fieldSuggestions = [
   {
-    field: 'Field',
-    description: 'Description',
-    disabled: true
-  },
-  {
+    type: 'FIELD',
     field: 'datasetKey',
     description: 'From what dataset does the occurrence come from'
   },
   {
+    type: 'FIELD',
     field: 'taxonKey',
     description: 'What taxon should the occurrence be or has as a parent'
   }
 ];
-['q','w','e','r','t','y','u','i','a','s','d','f','g','h','j','k','z','x','c','v','b','n','m'].forEach(function(e){
-  suggestions.push({field: e, description: 'something goes here'});
-});
 
 const menuStyle = {
   borderRadius: '3px',
@@ -32,9 +31,8 @@ const menuStyle = {
   background: 'white',
   padding: '2px 0',
   fontSize: '90%',
-  position: 'fixed',
   overflow: 'auto',
-  maxHeight: '50%',
+  maxHeight: '60vh',
   zIndex: '998',
 };
 
@@ -43,7 +41,12 @@ class SearchBar extends Component {
     super(props);
 
     this.onChange = this.onChange.bind(this);
-    this.state = { suggestions: suggestions, value: props.value };
+    this.onKeyUp = this.onKeyUp.bind(this);
+    this.onBlur = this.onBlur.bind(this);
+
+    this.suggester = MultiSuggest();
+
+    this.state = { fieldSuggestions: fieldSuggestions, value: props.value };
   }
 
   componentDidMount() {
@@ -68,36 +71,114 @@ class SearchBar extends Component {
   onChange(val) {
     this.setState({ value: val });
     // this.getSuggestions(val);
+    if (val.length > 2) {
+    this.suggester(val)
+      .then((suggestions) => {
+        this.setState({suggestions: suggestions});
+      })
+      .catch((err) => (console.log(err)));
+    } else {
+      this.setState({suggestions: []});
+    }
+
   }
 
-  onSelect(val) {
+  onSelect(item) {
+    let val = item.field;
     this.setState({ value: val });
-    this.props.onSelect(val);
+    if (item.type === 'FIELD') {
+      console.log('Open select widget for: ' + val);
+    } else if (item.type === 'VALUE') {
+      this.props.updateFilter(item.field, item.key, 'ADD');
+    }
+    
+    this.setState({forceOpen: false, value: ''});
+  }
+
+  onKeyUp(e) {
+    if (e.keyCode === ARROW_DOWN_KEY || e.keyCode === ARROW_UP_KEY) {
+      this.setState({forceOpen: true});
+    } else if(e.keyCode === ESCAPE_KEY) {
+      this.setState({forceOpen: false });
+    } else if(e.keyCode === ENTER_KEY && e.target.value && e.target.value !== '') {
+      this.props.updateFilter('q', e.target.value, 'ADD');
+      // this.setState({forceOpen: false, value: '' });
+    }
+  }
+
+  onBlur() {
+    this.setState({forceOpen: false, value: '', suggestions: []});
   }
 
   render() {
     let renderItem = function (item, highlighted) {
-      return (
-        <div key={item.field} style={{ backgroundColor: highlighted ? '#d3dce0' : 'transparent' }}>
-          <div>{item.field}</div>
-          <div>{item.description}</div>
-        </div>
-      )
+      switch (item.type) {
+        case 'HEADER' :
+          return (
+            <div key={ 'col_' + item.name} className="disabled">
+              <div>{item.col1}</div>
+              <div>{item.col2}</div>
+            </div>
+          );
+        case 'FIELD' :
+          return (
+            <div key={ 'field_' + item.field} style={{ backgroundColor: highlighted ? '#d3dce0' : undefined }}>
+              <div><span className="fieldName">{item.field}</span></div>
+              <div className="fieldDescription">{item.description}</div>
+            </div>
+          );
+        default :
+        return (
+          <div key={ 'value_' + item.field + '_' + item.key} className="reverse" style={{ backgroundColor: highlighted ? '#d3dce0' : undefined }}>
+            <div>
+              <div className="fieldValue">
+                {item.value}
+              </div>
+              <div className="fieldDescription">
+                {item.description}
+              </div>
+            </div>
+            <div><a className="fieldName">{item.field}</a></div>
+          </div>
+        );
+      }
     };
+
+    let items = _.filter(this.state.fieldSuggestions, (item) => (item.field.startsWith(this.state.value || '') || item.disabled));
+    if (items.length > 0) {
+      items.unshift(
+        {
+          type: 'HEADER',
+          name: 'fieldSuggestions',
+          col1: 'Field',
+          col2: 'Description',
+          disabled: true
+        }
+      );
+    }
+    if (_.isArray(this.state.suggestions) && this.state.suggestions.length > 0) {
+      items.push({
+        type: 'HEADER',
+        col1: 'Value',
+        name: 'valueSuggestions',
+        col2: 'Field',
+        disabled: true
+      });
+      items = _.concat(items, this.state.suggestions);
+    }
 
     return (
       <div className="searchBar">
         <ReactAutocomplete
-          open={this.state.value}
+          open={!!this.state.value || this.state.forceOpen}
           autoHighlight={false}
-          shouldItemRender={(item, str) => (item.field.startsWith(str) || item.disabled)}
           wrapperProps={{className: 'searchBarSuggest'}}
           isItemSelectable={item => !item.disabled}
           wrapperStyle={{}}
-          items={this.state.suggestions}
-          getItemValue={item => item.field}
+          items={items}
+          getItemValue={item => item}
           renderItem={renderItem}
-          inputProps={{ placeholder: 'Search' }}
+          inputProps={{ placeholder: 'Search', onKeyUp: this.onKeyUp, onBlur: this.onBlur }}
           value={this.state.value}
           menuStyle={menuStyle}
           onChange={e => this.onChange(e.target.value)}

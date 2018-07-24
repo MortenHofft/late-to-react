@@ -42,7 +42,6 @@ class Gallery extends Component {
   }
 
   render() {
-    const styleItem = {display: 'inline-block'};
     const listItems = this.state.occurrences.map(function(e, i){
       return (
         <GalleryImg key={i} src={e.media[0].identifier} />
