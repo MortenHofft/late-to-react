@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
 import { Router, Route, Switch, Link } from "react-router-dom";
+import _ from 'lodash';
+import objectHash from 'object-hash';
+import queryString from 'query-string'
+
 import history from './history'
 
 import Gallery from './views/Gallery';
@@ -7,9 +11,6 @@ import Table from './views/Table';
 import Split from './views/Split';
 import Filter from './Filter';
 import Summary from './Summary';
-import _ from 'lodash';
-import objectHash from 'object-hash';
-import queryString from 'query-string'
 
 require('./App.css');
 

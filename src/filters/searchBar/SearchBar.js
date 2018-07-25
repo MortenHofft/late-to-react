@@ -3,6 +3,8 @@ import _ from 'lodash';
 import ReactAutocomplete from 'react-autocomplete';
 
 import MultiSuggest from './MultiSuggest';
+import ModalBlocker from '../../modal/ModalBlocker';
+import If from '../If';
 
 require('./SearchBar.css');
 
@@ -43,10 +45,12 @@ class SearchBar extends Component {
     this.onChange = this.onChange.bind(this);
     this.onKeyUp = this.onKeyUp.bind(this);
     this.onBlur = this.onBlur.bind(this);
+    this.handleShow = this.handleShow.bind(this);
+    this.handleHide = this.handleHide.bind(this);
 
     this.suggester = MultiSuggest();
 
-    this.state = { fieldSuggestions: fieldSuggestions, value: props.value };
+    this.state = { fieldSuggestions: fieldSuggestions, value: props.value, showModal: false };
   }
 
   componentDidMount() {
@@ -110,6 +114,14 @@ class SearchBar extends Component {
     this.setState({forceOpen: false, value: '', suggestions: []});
   }
 
+  handleShow() {
+    this.setState({showModal: true});
+  }
+  
+  handleHide() {
+    this.setState({showModal: false});
+  }
+
   render() {
     let renderItem = function (item, highlighted) {
       switch (item.type) {
@@ -168,23 +180,32 @@ class SearchBar extends Component {
     }
 
     return (
-      <div className="searchBar">
-        <ReactAutocomplete
-          open={!!this.state.value || this.state.forceOpen}
-          autoHighlight={false}
-          wrapperProps={{className: 'searchBarSuggest'}}
-          isItemSelectable={item => !item.disabled}
-          wrapperStyle={{}}
-          items={items}
-          getItemValue={item => item}
-          renderItem={renderItem}
-          inputProps={{ placeholder: 'Search', onKeyUp: this.onKeyUp, onBlur: this.onBlur }}
-          value={this.state.value}
-          menuStyle={menuStyle}
-          onChange={e => this.onChange(e.target.value)}
-          onSelect={value => this.onSelect(value)}
-        />
-      </div>
+      <React.Fragment>
+        <div className="searchBar">
+          <ReactAutocomplete
+            open={!!this.state.value || this.state.forceOpen}
+            autoHighlight={false}
+            wrapperProps={{className: 'searchBarSuggest'}}
+            isItemSelectable={item => !item.disabled}
+            wrapperStyle={{}}
+            items={items}
+            getItemValue={item => item}
+            renderItem={renderItem}
+            inputProps={{ placeholder: 'Search', onKeyUp: this.onKeyUp, onBlur: this.onBlur }}
+            value={this.state.value}
+            menuStyle={menuStyle}
+            onChange={e => this.onChange(e.target.value)}
+            onSelect={value => this.onSelect(value)}
+          />
+        </div>
+        <button onClick={this.handleShow}>SHOOoooooow</button>
+        <If show={this.state.showModal}>
+          <ModalBlocker onClose={this.handleHide}>
+            <h1>sdfkjh</h1>
+            <button onClick={this.handleHide}>Hiiiiide</button>
+          </ModalBlocker>
+        </If>
+      </React.Fragment>
     );
   }
 }

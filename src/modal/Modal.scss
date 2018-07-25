@@ -1,0 +1,24 @@
+// this doesn't seem ideal perhaps find inspiration at https://medium.com/@andrejsabrickis/a-fullscreen-modal-with-fixed-header-footer-and-a-scrollable-content-1656845c8171
+.modal, .modal_backdrop {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+.modal {
+    z-index: 1000;
+    &_backdrop {
+        background: rgba(255, 255, 255, 0.75);
+    }
+    &_content {
+        box-shadow: 0 0 15px 10px rgba(0,0,0,.1);
+        background: white;
+        max-height: calc(100% - 100px);
+        position: fixed;
+            top: 50%;
+            left: 50%;
+        transform: translate(-50%, -50%);
+        overflow: auto;
+    }
+}
