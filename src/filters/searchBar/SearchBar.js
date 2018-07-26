@@ -221,7 +221,7 @@ class SearchBar extends Component {
           />
         </div>
         <If show={this.state.showModal}>
-          <ModalFilter onClose={this.handleHide} filter={this.props.filter} updateFilter={this.props.updateFilter} />
+          <ModalFilter onClose={this.handleHide} filter={this.props.filter} updateFilter={this.props.updateFilter} field="datasetKey" />
         </If>
       </React.Fragment>
     );

@@ -25,6 +25,7 @@ class Table extends Component {
       fields: [
         {
           name: 'scientificName',
+          filter: 'taxonKey',
           width: 200
         },
         {
@@ -126,9 +127,14 @@ class Table extends Component {
 
   getHeaders() {
     let handleShow = this.handleShow;
-    return this.fieldConfig.fields.map(function(field){
-      let filterButton = config.widgets.filters[field.name] ? <i className="material-icons u-secondaryTextColor u-small" onClick={() => (handleShow(field.name))} >filter_list</i> : null;
-      return <th key={field.name}><span>{field.name} {filterButton}</span></th>;
+    let setState = () => (this.setState({stickyCol: !this.state.stickyCol}));
+    let icon = this.state.stickyCol ? 'lock' : 'lock_open';
+
+    return this.fieldConfig.fields.map(function(field, index){
+      let name = field.filter || field.name;
+      let filterButton = config.widgets.filters[name] ? <i className="material-icons u-secondaryTextColor u-small" onClick={() => (handleShow(name))} >filter_list</i> : null;
+      let stickyButton = index === 0 ? <i className="material-icons u-secondaryTextColor u-small" onClick={setState}>{icon}</i> : null;
+      return <th key={field.name}><span>{field.name} {filterButton} {stickyButton}</span></th>;
     });
   }
 
@@ -161,9 +167,10 @@ class Table extends Component {
     let headers = this.getHeaders();
 
     let scrolled = this.state.scrolled ? 'scrolled' : '';
+    let stickyCol = this.state.stickyCol ? 'stickyCol' : '';
     return (
       <div>
-        <div>
+        <div className={stickyCol}>
           <table id="table" className={scrolled} onScroll={ this.bodyScroll }>
             <thead>
               <tr>
@@ -174,6 +181,11 @@ class Table extends Component {
               {tbody}
             </tbody>
           </table>
+          <div className="pagination-small">
+            <i class="material-icons">first_page</i>
+            <i class="material-icons">keyboard_arrow_left</i>
+            <i class="material-icons">keyboard_arrow_right</i>
+          </div>
         </div>
         <button onClick={() => this.nextPage()}>next</button>
         <div>

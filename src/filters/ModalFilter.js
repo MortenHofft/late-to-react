@@ -45,10 +45,10 @@ class ModalFilter extends Component {
     }
 
     handleHide() {
-        if (this.state.modalFilter.query.datasetKey) {
-            this.props.updateFilter('datasetKey', this.state.modalFilter.query.datasetKey, 'ADD');
+        if (this.state.modalFilter.query[this.props.field]) {
+            this.props.updateFilter(this.props.field, this.state.modalFilter.query[this.props.field], 'ADD');
         } else {
-            this.props.updateFilter('datasetKey', null, 'CLEAR');
+            this.props.updateFilter(this.props.field, null, 'CLEAR');
         }
         console.log('update');
         this.props.onClose();

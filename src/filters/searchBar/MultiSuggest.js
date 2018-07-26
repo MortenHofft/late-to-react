@@ -1,8 +1,9 @@
-import _ from 'lodash';
 import axios from 'axios';
 import queryString from 'query-string';
+import Promise from 'bluebird';
 
-var Promise = require('bluebird');
+import config from '../../config';
+let suggestConfig = config.suggest
 
 let CancelToken = axios.CancelToken;
 
@@ -19,48 +20,36 @@ function MultiSuggest() {
             cancel = c;
         });
 
-        let datasetKey = axios.get('https://api.gbif.org/v1/dataset/suggest?' + queryString.stringify(filter), {
-            cancelToken: cancelToken
-        });
-
-        let taxonKey = axios.get('https://api.gbif.org/v1/species/suggest?' + queryString.stringify(filter), {
-            cancelToken: cancelToken
-        });
-
-        let basisOfRecordResults = [
-            'PRESERVED_SPECIMEN',
-            'FOSSIL_SPECIMEN',
-            'LIVING_SPECIMEN',
-            'OBSERVATION',
-            'HUMAN_OBSERVATION',
-            'MACHINE_OBSERVATION',
-            'MATERIAL_SAMPLE',
-            'LITERATURE',
-            'UNKNOWN'].filter((e) => (e.toLowerCase().replace('_', ' ').startsWith(searchText.toLowerCase())));
-
-        return Promise.props({
-            datasetKey: datasetKey,
-            taxonKey: taxonKey,
-            basisOfRecord: basisOfRecordResults
-        }).then(function(result) {
-            let datasets = result.datasetKey.data.map((e) => ({type: 'VALUE', field: 'datasetKey', key: e.key, value: e.title}));
-            let species = result.taxonKey.data.map((e) => {
-                    let classification = '';
-                    ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species'].forEach(function(rank){
-                        if (e[rank]) {
-                            if (classification !== '') {
-                                classification += ' ❯ ';
-                            }
-                            classification += e[rank];
-                        }
-                    });
-                    return {type: 'VALUE', field: 'taxonKey', key: e.key, value: e.scientificName, description: classification}
+        let suggestPromises = {};
+        Object.keys(suggestConfig).forEach(function(field){
+            let url = suggestConfig[field].endpoint + '?' + queryString.stringify(filter);
+            suggestPromises[field] = axios.get(url, {
+                cancelToken: cancelToken
+            }).then(function(response){
+                if (suggestConfig[field].type === 'ENUM') {
+                    return response.data.filter((e) => (e.toLowerCase().replace('_', ' ').startsWith(searchText.toLowerCase()))).slice(0,2);
+                } else {
+                    return response.data;
                 }
-            );
-            let basisOfRecord = result.basisOfRecord.map((e) => ({type: 'VALUE', field: 'basisOfRecord', key: e, value: e}));
-            let suggestions = _.concat(species, datasets, basisOfRecord);
-            return suggestions;
+            });
         });
+
+        return Promise.props(suggestPromises)
+            .then(function(result) {
+                let list = [];
+                Object.keys(result).forEach(function(field){
+                    let mapper;
+                    if (suggestConfig[field].type === 'ENUM') {
+                        mapper = (e) => ({type: 'VALUE', field: field, key: e, value: e});
+                    } else {
+                        let description = suggestConfig[field].description || ((e) => (undefined));
+                        mapper = (e) => ({type: 'VALUE', field: field, key: e[suggestConfig[field].key], value: e[suggestConfig[field].title], description: description(e)});
+                    }
+                    let mappedSuggestions = result[field].map(mapper);
+                    list = list.concat(mappedSuggestions);
+                });
+                return list;
+            });
     };
 
     return suggester;

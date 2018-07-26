@@ -21,11 +21,42 @@ var widgets = {
     }
 };
 
+let suggest = {
+    datasetKey: {
+        endpoint: 'https://api.gbif.org/v1/dataset/suggest',
+        key: 'key',
+        title: 'title'
+    },
+    taxonKey: {
+        endpoint: 'https://api.gbif.org/v1/species/suggest',
+        key: 'key',
+        title: 'scientificName',
+        description: function(item){
+            let classification = '';
+            ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species'].forEach(function(rank){
+                if (item[rank]) {
+                    if (classification !== '') {
+                        classification += ' ❯ ';
+                    }
+                    classification += item[rank];
+                }
+            });
+            return classification;
+        }
+    },
+    basisOfRecord: {
+        type: 'ENUM',
+        endpoint: 'http://api.gbif.org/v1/enumeration/basic/BasisOfRecord'
+    },
+    issue: {
+        type: 'ENUM',
+        endpoint: 'http://api.gbif.org/v1/enumeration/basic/OccurrenceIssue'
+    }
+};
+
 let config = {
     widgets: widgets,
-    activeWidgets: [
-        {type: 'FILTER', field: 'taxonKey'}
-    ]
+    suggest: suggest
 };
 
 export default config;
