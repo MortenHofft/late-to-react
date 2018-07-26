@@ -37,7 +37,16 @@ class FreeText extends Component {
   }
 
   componentWillUnmount() {
-    // Cancel fetch callback?
+    // Cancel fetch 
+    /*
+    Warning: Can't call setState (or forceUpdate) on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in the componentWillUnmount method.
+    in FreeText (at SearchBar.js:247)
+    in div (at ModalBlocker.js:13)
+    in div (at ModalBlocker.js:12)
+    in div (at ModalBlocker.js:10)
+    in Modal (at ModalBlocker.js:9)
+    in ModalBlocker (at SearchBar.js:246)
+    */
   }
 
   componentDidUpdate(prevProps) {

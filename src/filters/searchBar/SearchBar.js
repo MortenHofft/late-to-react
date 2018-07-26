@@ -3,10 +3,20 @@ import _ from 'lodash';
 import ReactAutocomplete from 'react-autocomplete';
 
 import MultiSuggest from './MultiSuggest';
-import ModalBlocker from '../../modal/ModalBlocker';
+import ModalFilter from '../ModalFilter';
 import If from '../If';
 
 require('./SearchBar.css');
+
+function asArray(value) {
+  if (_.isUndefined(value)) {
+    return [];
+  } else if (_.isArray(value)) {
+    return value;
+  } else {
+    return [value];
+  }
+}
 
 const ARROW_DOWN_KEY = 40;
 const ARROW_UP_KEY = 37;
@@ -64,6 +74,12 @@ class SearchBar extends Component {
     this.setState({ value: nextProps.value });
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.filter.hash !== this.props.filter.hash) {
+      this.setState({modalFilter: this.props.filter})
+    }
+  }
+
   getSuggestions(searchText) {
     this.setState({
       suggestions: [
@@ -92,6 +108,7 @@ class SearchBar extends Component {
     this.setState({ value: val });
     if (item.type === 'FIELD') {
       console.log('Open select widget for: ' + val);
+      this.setState({showModal: true});
     } else if (item.type === 'VALUE') {
       this.props.updateFilter(item.field, item.key, 'ADD');
     }
@@ -186,6 +203,11 @@ class SearchBar extends Component {
             open={!!this.state.value || this.state.forceOpen}
             autoHighlight={false}
             wrapperProps={{className: 'searchBarSuggest'}}
+            renderMenu={children =>
+              <div className="suggestMenu">
+                {children}
+              </div>
+            }
             isItemSelectable={item => !item.disabled}
             wrapperStyle={{}}
             items={items}
@@ -198,12 +220,8 @@ class SearchBar extends Component {
             onSelect={value => this.onSelect(value)}
           />
         </div>
-        <button onClick={this.handleShow}>SHOOoooooow</button>
         <If show={this.state.showModal}>
-          <ModalBlocker onClose={this.handleHide}>
-            <h1>sdfkjh</h1>
-            <button onClick={this.handleHide}>Hiiiiide</button>
-          </ModalBlocker>
+          <ModalFilter onClose={this.handleHide} filter={this.props.filter} updateFilter={this.props.updateFilter} />
         </If>
       </React.Fragment>
     );

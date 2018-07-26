@@ -80,15 +80,20 @@ class Suggest extends Component {
 
     return (
         <ReactAutocomplete
-            wrapperStyle={{}}
-            items={this.state.suggestions}
-            getItemValue={getItemValue}
-            renderItem={renderItem} 
-            inputProps={{ placeholder: 'Search' }}
-            value={this.state.value}
-            onChange={e => this.onChange(e.target.value)}
-            onSelect={value => this.onSelect( value )}
-            />
+          wrapperStyle={{ position: 'relative'}}
+          renderMenu={children =>
+            <div className="suggestMenu">
+              {children}
+            </div>
+          }
+          items={this.state.suggestions}
+          getItemValue={getItemValue}
+          renderItem={renderItem} 
+          inputProps={{ placeholder: 'Search' }}
+          value={this.state.value}
+          onChange={e => this.onChange(e.target.value)}
+          onSelect={value => this.onSelect( value )}
+          />
     );
   }
 }

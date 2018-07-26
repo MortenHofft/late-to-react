@@ -23,7 +23,7 @@ function Summary(props) {
     });
     const element = (
         <div style={style}>
-            <SearchBar updateFilter={props.updateFilter}/>
+            <SearchBar filter={props.filter} updateFilter={props.updateFilter}/>
             <ul className="chips">
                 {filters}
             </ul>

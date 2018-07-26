@@ -9,8 +9,10 @@ function ModalBlocker(props) {
         <Modal>
             <div className="modal">
                 <div className="modal_backdrop" onClick={props.onClose}></div>
-                <div className="modal_content">
-                    {props.children}
+                <div className="modal_contentWrapper">
+                    <div className="modal_card">
+                        {props.children}
+                    </div>
                 </div>
             </div>
         </Modal>

@@ -101,14 +101,13 @@ dd, dt {
 .filter {
   background: white;
   margin-bottom: 6px;
-  border-radius: 3px;
-  padding-bottom: 24px; }
+  border-radius: 3px; }
 
 .filter .material-icons {
   font-size: 18px; }
 
 .filter__content {
-  overflow: hidden; }
+  padding: 24px 0; }
 
 .filter__header, .filter__info {
   margin-right: 24px;
@@ -116,9 +115,6 @@ dd, dt {
   display: flex;
   justify-content: space-between;
   align-items: center; }
-
-.filter__header {
-  margin-top: 24px; }
 
 .filter__header h3 {
   color: #2e3c43;
@@ -265,3 +261,16 @@ dd, dt {
   border-width: 0 1px 0 0;
   border-radius: 3px 0 0 3px;
   color: #6f6f6f; }
+
+.suggestMenu {
+  position: absolute;
+  border-radius: 3px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  border: 1px solid #ddd;
+  background: white;
+  padding: 2px 0;
+  font-size: 90%;
+  overflow: auto;
+  max-height: 60vh;
+  width: 100%;
+  z-index: 998; }

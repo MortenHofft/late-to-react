@@ -53,6 +53,7 @@ class Suggest extends Component {
     return (
         <ReactAutocomplete
             wrapperStyle={{}}
+            open={true}
             items={this.state.suggestions}
             getItemValue={item => item}
             renderItem={(item, highlighted) =>

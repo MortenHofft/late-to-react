@@ -29,11 +29,14 @@ class App extends Component {
     super(props);
     this.updateFilter = this.updateFilter.bind(this);
     this.filterFromUrl = this.filterFromUrl.bind(this);
+    this.updateWidgets = this.updateWidgets.bind(this);
+
     const query = queryString.parse(window.location.search);
     this.state = {
       filter: {
         query: query
-      }
+      },
+      widgets: []
     };
     this.state.filter.hash = objectHash(this.state.filter.query);
 
@@ -42,13 +45,18 @@ class App extends Component {
     });
   }
 
+  updateWidgets(widget) {
+    let widgets = this.state.widgets.concat([{type: 'FILTER', field: widget}]);
+    this.setState({widgets: widgets});
+  }
+
   updateFilter(param, value, action) {
+    console.log('update in ap.js');
     let paramValues = asArray(this.state.filter.query[param]);
     if (action === 'CLEAR') {
-      console.log('clear');
       paramValues = '';
     } else if (action === 'ADD') {
-      paramValues.push(value);
+      paramValues = _.uniq(paramValues.concat(value));
     } else if (action === 'REMOVE') {
       _.remove(paramValues, function(n) {
         return n === value;
@@ -78,9 +86,10 @@ class App extends Component {
       <Router history={history}>
         <div>
           <div className="menu"></div>
-          <Filter filter={this.state.filter} updateFilter={this.updateFilter} />
+          { this.state.widgets.length == 0 || <Filter filter={this.state.filter} updateFilter={this.updateFilter} widgets={this.state.widgets} updateWidgets={this.updateWidgets}/> }
           <main>
             <section>
+              <button onClick={() => (this.updateWidgets('datasetKey'))}>add new widget</button>
               <Summary filter={this.state.filter} updateFilter={this.updateFilter} />
             </section>
             <section>

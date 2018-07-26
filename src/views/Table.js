@@ -3,17 +3,24 @@ import queryString from 'query-string'
 import _ from 'lodash';
 
 import displayName from '../filters/fieldFormats';
+import If from '../filters/If';
+import ModalFilter from '../filters/ModalFilter';
+import config from '../config';
 
 require('./table.css');
 
 class Table extends Component {
   constructor(props) {
     super(props);
+
     this.updateFilter = this.updateFilter.bind(this);
     this.updateResults = this.updateResults.bind(this);
     this.getHeaders = this.getHeaders.bind(this);
     this.getRow = this.getRow.bind(this);
     this.bodyScroll = this.bodyScroll.bind(this);
+    this.handleShow = this.handleShow.bind(this);
+    this.handleHide = this.handleHide.bind(this);
+
     this.fieldConfig = {
       fields: [
         {
@@ -31,6 +38,10 @@ class Table extends Component {
         {
           name: 'datasetKey',
           width: 200
+        },
+        {
+          name: 'institutionCode',
+          width: 100
         },
         {
           name: 'year',
@@ -68,7 +79,8 @@ class Table extends Component {
     };
     this.state = {
       page: {limit: 50, offset: 0},
-      occurrences: []
+      occurrences: [],
+      showModalFilter: false
     }
   }
 
@@ -113,8 +125,10 @@ class Table extends Component {
   }
 
   getHeaders() {
+    let handleShow = this.handleShow;
     return this.fieldConfig.fields.map(function(field){
-      return <th key={field.name}><span>{field.name}</span></th>;
+      let filterButton = config.widgets.filters[field.name] ? <i className="material-icons u-secondaryTextColor u-small" onClick={() => (handleShow(field.name))} >filter_list</i> : null;
+      return <th key={field.name}><span>{field.name} {filterButton}</span></th>;
     });
   }
 
@@ -127,6 +141,14 @@ class Table extends Component {
 
   bodyScroll() {
     this.setState({scrolled: document.getElementById('table').scrollLeft !== 0});
+  }
+
+  handleShow(field) {
+    this.setState({showModalFilter: true, modalField: field});
+  }
+  
+  handleHide() {
+    this.setState({showModalFilter: false});
   }
 
   render() {
@@ -159,6 +181,9 @@ class Table extends Component {
           {JSON.stringify(this.props.filter.query, null, 2)}
           {JSON.stringify(this.state.page , null, 2)}
         </div>
+        <If show={this.state.showModalFilter}>
+          <ModalFilter onClose={this.handleHide} filter={this.props.filter} updateFilter={this.props.updateFilter} field={this.state.modalField}/>
+        </If>
       </div>
     );
   }
