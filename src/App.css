@@ -28,11 +28,13 @@ button {
   background: #1785fb; }
 
 main {
-  margin-right: 350px;
+  margin-right: 10px;
   margin-left: 56px;
   display: flex;
   flex-direction: column;
   height: 100vh; }
+  main.showWidgetPanel {
+    margin-right: 350px; }
   main > section {
     flex: 0 0 auto; }
     main > section:last-of-type {
@@ -125,6 +127,7 @@ dd, dt {
 .filter__header, .filter__info {
   margin-right: 24px;
   margin-left: 24px;
+  margin-bottom: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center; }
@@ -143,6 +146,7 @@ dd, dt {
   margin-right: 5px; }
 
 .filter__search {
+  margin-top: 24px;
   border: 1px solid #eee;
   border-width: 1px 0;
   position: relative; }

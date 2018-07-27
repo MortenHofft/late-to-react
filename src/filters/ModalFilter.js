@@ -3,9 +3,10 @@ import _ from 'lodash';
 
 import ModalBlocker from '../modal/ModalBlocker';
 import FreeText from './FreeText';
-import displayName from './fieldFormats';
 import objectHash from 'object-hash';
 import config from '../config';
+
+import {SearchContext} from '../searchContext';
 
 function asArray(value) {
     if (_.isUndefined(value)) {
@@ -44,13 +45,12 @@ class ModalFilter extends Component {
         }
     }
 
-    handleHide() {
+    handleHide(updateFilter) {
         if (this.state.modalFilter.query[this.props.field]) {
-            this.props.updateFilter(this.props.field, this.state.modalFilter.query[this.props.field], 'ADD');
+            updateFilter(this.props.field, this.state.modalFilter.query[this.props.field], 'UPDATE');
         } else {
-            this.props.updateFilter(this.props.field, null, 'CLEAR');
+            updateFilter(this.props.field, null, 'CLEAR');
         }
-        console.log('update');
         this.props.onClose();
     }
 
@@ -77,9 +77,13 @@ class ModalFilter extends Component {
 
     render() {
         return (
-            <ModalBlocker onClose={this.handleHide}>
-                <FreeText filter={this.state.modalFilter} updateFilter={this.updateModalFilter} options={config.widgets.filters[this.props.field].options} />
-            </ModalBlocker>
+            <SearchContext.Consumer>
+                {({updateFilter}) =>
+                <ModalBlocker onClose={() => {this.handleHide(updateFilter)}}>
+                    <FreeText filter={this.state.modalFilter} updateFilter={(a,b,c) => {this.updateModalFilter(a, b, c, updateFilter)}} options={config.widgets.filters[this.props.field].options} />
+                </ModalBlocker>
+                }
+            </SearchContext.Consumer>
         );
     }
 }

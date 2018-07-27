@@ -81,7 +81,6 @@ class Suggest extends Component {
       )};
     renderItem = this.props.renderItem ? this.props.renderItem : renderItem;
 
-    console.log(this.state.suggestions.length);
     let shouldItemRender = keyField ? (item, value) => {return true;} : (item, value) => {return value !== '' && item.toLowerCase().startsWith(value.toLowerCase())};
 
     return (

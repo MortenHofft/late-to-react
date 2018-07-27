@@ -17,7 +17,6 @@ class Filter extends Component {
           <section>
             {widgets}
           </section>
-          <button onClick={() => (this.props.updateWidgets('basisOfRecord'))}>add new widget</button>
         </div>
     );
   }

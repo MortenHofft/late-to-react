@@ -9,23 +9,23 @@ function getListItem(param, value, index, cb) {
     return <li key={index} className="chip" onClick={() => cb(param, value, 'REMOVE')}><span>{param}</span><DisplayName id={value} /></li>
 }
 function Summary(props) {
-    const style = {padding: '10px'};
-    let filters = [];
+    const style = {margin: '10px 0 10px 10px'};
+    let filterChips = [];
     let index = 0;
     Object.keys(props.filter.query).forEach(function(param){
         if (_.isArray(props.filter.query[param])) {
             props.filter.query[param].forEach(function(value){
-                filters.push(getListItem(param, value, index++, props.updateFilter));
+                filterChips.push(getListItem(param, value, index++, props.updateFilter));
             });
         } else {
-            filters.push(getListItem(param, props.filter.query[param], index++, props.updateFilter));
+            filterChips.push(getListItem(param, props.filter.query[param], index++, props.updateFilter));
         }
     });
     const element = (
         <div style={style}>
             <SearchBar filter={props.filter} updateFilter={props.updateFilter}/>
             <ul className="chips">
-                {filters}
+                {filterChips}
             </ul>
         </div>
     );

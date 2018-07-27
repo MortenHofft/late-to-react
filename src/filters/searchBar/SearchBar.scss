@@ -1,13 +1,12 @@
 .searchBar {
-    border: 1px solid deepskyblue;
+    border: 1px solid #ddd;
     position: relative;
-    height: 40px;
     z-index: 50;
     input {
-        height: 40px;
         display: block;
         width: 100%;
         padding: 10px;
+        border: none;
     }
 }
 

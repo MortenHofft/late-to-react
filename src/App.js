@@ -6,13 +6,20 @@ import queryString from 'query-string'
 
 import history from './history'
 
+import { SearchContext } from './searchContext';
+
 import Gallery from './views/Gallery';
 import Table from './views/Table';
 import Split from './views/Split';
 import Filter from './Filter';
 import Summary from './Summary';
+import If from './filters/If';
 
 require('./App.css');
+
+
+// let searchManager = new SearchManager();
+// console.log(searchManager.state);
 
 function asArray(value) {
   if (_.isUndefined(value)) {
@@ -30,6 +37,7 @@ class App extends Component {
     this.updateFilter = this.updateFilter.bind(this);
     this.filterFromUrl = this.filterFromUrl.bind(this);
     this.updateWidgets = this.updateWidgets.bind(this);
+    this.hasWidget = this.hasWidget.bind(this);
 
     const query = queryString.parse(window.location.search);
     this.state = {
@@ -37,11 +45,12 @@ class App extends Component {
         query: query
       },
       widgets: [
-        {
-          type: 'FILTER',
-          field: 'datasetKey'
-        }
-      ]
+        { type: 'FILTER', field: 'datasetKey' },
+        { type: 'FILTER', field: 'country' }
+      ],
+      updateFilter: this.updateFilter,
+      updateWidgets: this.updateWidgets,
+      hasWidget: this.hasWidget
     };
     this.state.filter.hash = objectHash(this.state.filter.query);
 
@@ -50,9 +59,18 @@ class App extends Component {
     });
   }
 
-  updateWidgets(widget) {
-    let widgets = this.state.widgets.concat([{type: 'FILTER', field: widget}]);
-    this.setState({widgets: widgets});
+  updateWidgets(field, action) {
+    let widgets = [];
+    if (action === 'REMOVE') {
+      widgets = _.filter(this.state.widgets, item => {return item.field !== field});
+    } else {
+      widgets = _.uniqBy(this.state.widgets.concat([{ type: 'FILTER', field: field }]), objectHash);
+    }
+    this.setState({ widgets: widgets });
+  }
+
+  hasWidget(field){
+    return typeof _.find(this.state.widgets, {field: field}) !== 'undefined';
   }
 
   updateFilter(param, value, action) {
@@ -61,20 +79,20 @@ class App extends Component {
       paramValues = '';
     } else if (action === 'ADD') {
       paramValues = _.uniq(paramValues.concat(value));
+    } else if (action === 'UPDATE') {
+      paramValues = _.uniq([].concat(value));
     } else if (action === 'REMOVE') {
-      _.remove(paramValues, function(n) {
+      _.remove(paramValues, function (n) {
         return n === value;
       });
     } else {
       paramValues = [value];
     }
-    let filter = _.merge({}, this.state.filter.query, {[param]: paramValues});
+    let filter = _.assign({}, this.state.filter.query, { [param]: paramValues });
     if (!paramValues) {
       delete filter[param];
     }
     history.push(window.location.pathname + '?' + queryString.stringify(filter));
-    // filter.hash = objectHash(filter);
-    // this.setState({filter: filter});
   }
 
   filterFromUrl(location) {
@@ -82,38 +100,42 @@ class App extends Component {
     const query = queryString.parse(location.search);
     filter.hash = objectHash(query);
     filter.query = query;
-    this.setState({filter: filter});
+    this.setState({ filter: filter });
   }
 
   render() {
+    let showWidgetPanel = this.state.widgets.length > 0;
     return (
       <Router history={history}>
-        <div>
-          <div className="menu"></div>
-          { this.state.widgets.length == 0 || <Filter filter={this.state.filter} updateFilter={this.updateFilter} widgets={this.state.widgets} updateWidgets={this.updateWidgets}/> }
-          <main>
-            <section>
-              <button onClick={() => (this.updateWidgets('datasetKey'))}>add new widget</button>
-              <Summary filter={this.state.filter} updateFilter={this.updateFilter} />
-            </section>
-            <section className="viewSelectorWrapper">
-              <ul className="viewSelector">
-                <li>
-                  <NavLink to={{ pathname: '/', search: queryString.stringify(this.state.filter.query) }} exact={true} activeClassName="active">Table</NavLink>
-                </li>
-                <li>
-                  <NavLink to={{ pathname: '/gallery', search: queryString.stringify(this.state.filter.query) }} activeClassName="active">Gallery</NavLink>
-                </li>
-              </ul>
-            </section>
-            <Switch>
-              <Route exact path="/" render={(props) => <Table filter={this.state.filter} updateFilter={this.updateFilter} />} />
-              <Route path="/gallery" render={(props) => <Gallery filter={this.state.filter} updateFilter={this.updateFilter} />} />
-              <Route path="/split" render={(props) => <Split filter={this.state.filter} updateFilter={this.updateFilter} />} />
-              <Route component={NoMatch} />
-            </Switch>
-          </main>
-        </div>
+        <SearchContext.Provider value={this.state}>
+          <div>
+            <div className="menu"></div>
+            <If show={showWidgetPanel}>
+              <Filter filter={this.state.filter} updateFilter={this.updateFilter} widgets={this.state.widgets} updateWidgets={this.updateWidgets} />
+            </If>
+            <main className={showWidgetPanel ? 'showWidgetPanel': null}>
+                <section>
+                  <Summary filter={this.state.filter} updateFilter={this.updateFilter} />
+                </section>
+              <section className="viewSelectorWrapper">
+                <ul className="viewSelector">
+                  <li>
+                    <NavLink to={{ pathname: '/', search: queryString.stringify(this.state.filter.query) }} exact={true} activeClassName="active">Table</NavLink>
+                  </li>
+                  <li>
+                    <NavLink to={{ pathname: '/gallery', search: queryString.stringify(this.state.filter.query) }} activeClassName="active">Gallery</NavLink>
+                  </li>
+                </ul>
+              </section>
+              <Switch>
+                <Route exact path="/" render={(props) => <Table filter={this.state.filter} updateFilter={this.updateFilter} />} />
+                <Route path="/gallery" render={(props) => <Gallery filter={this.state.filter} updateFilter={this.updateFilter} />} />
+                <Route path="/split" render={(props) => <Split filter={this.state.filter} updateFilter={this.updateFilter} />} />
+                <Route component={NoMatch} />
+              </Switch>
+            </main>
+          </div>
+        </SearchContext.Provider>
       </Router>
     );
   }

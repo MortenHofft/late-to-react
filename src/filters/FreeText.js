@@ -4,6 +4,7 @@ import queryString from 'query-string'
 import humanize from 'humanize-num'
 
 import Suggest from './SuggestKey'
+import {SearchContext} from '../searchContext';
 import If from './If'
 
 function asArray(value) {
@@ -177,50 +178,56 @@ class FreeText extends Component {
       );
     }
     return (
-      <div>
-        <div className="filter">
-          <If show={this.state.loading}><div className="loader"></div></If>
-          <div className="filter__content">
-            <div className="filter__header">
-              <h3 className="ellipsis">{this.props.options.field}</h3>
-              <div>
-                <If show={this.state.expanded}>
-                  <a onClick={() => this.setState({expanded: false})}><i className="material-icons u-secondaryTextColor">expand_less</i></a>
+      <SearchContext.Consumer>
+        {({updateWidgets, hasWidget}) =>
+          <div>
+            <div className="filter">
+              <If show={this.state.loading}><div className="loader"></div></If>
+              <div className="filter__content">
+                <div className="filter__header">
+                  <h3 className="ellipsis">{this.props.options.field}</h3>
+                  <div>
+                    <If show={hasWidget(this.props.options.field)}>
+                      <a onClick={() => updateWidgets(this.props.options.field, 'REMOVE')}><i className="material-icons u-secondaryTextColor">remove_circle_outline</i></a>
+                    </If>
+                    <If show={!hasWidget(this.props.options.field)}>
+                      <a onClick={() => updateWidgets(this.props.options.field)}><i className="material-icons u-secondaryTextColor">add_circle_outline</i></a>
+                    </If>
+                  </div>
+                </div>
+                <If show={false}>
+                  <div className="filter__info">
+                    <dl className="u-secondaryTextColor u-upperCase u-small">
+                      <dt>1.302</dt><dd>Datasets</dd>
+                      <dt>26</dt><dd>in view</dd>
+                    </dl>
+                  </div>
                 </If>
-                <If show={!this.state.expanded}>
-                  <a onClick={() => this.setState({expanded: true})}><i className="material-icons u-secondaryTextColor">expand_more</i></a>
-                </If>
+                {searchBlock}
+                <div className="filter__actions u-secondaryTextColor u-upperCase u-small">
+                  <If show={selectedCount > 0}>
+                    <p className="u-semibold">{selectedCount} selected</p>
+                  </If>
+                  <If show={selectedCount === 0 && this.state.expanded}>
+                    <p>All selected</p>
+                  </If>
+                  <If show={selectedCount > 0}>
+                    <button className="u-actionTextColor" onClick={() => this.props.updateFilter(this.props.options.field, null, 'CLEAR')}>All</button>
+                  </If>
+                </div>
+                <div className="filter__options">
+                  <ul>
+                    {selectedValues}
+                    <If show={this.state.expanded && this.props.options.showSuggestions}>
+                      {multiFacets}
+                    </If>
+                  </ul>
+                </div>
               </div>
             </div>
-            <div className="filter__info">
-              <dl className="u-secondaryTextColor u-upperCase u-small">
-                <dt>1.302</dt><dd>Datasets</dd>
-                <dt>26</dt><dd>in view</dd>
-              </dl>
-            </div>
-            {searchBlock}
-            <div className="filter__actions u-secondaryTextColor u-upperCase u-small">
-              <If show={selectedCount > 0}>
-                <p className="u-semibold">{selectedCount} selected</p>
-              </If>
-              <If show={selectedCount === 0 && this.state.expanded}>
-                <p>All selected</p>
-              </If>
-              <If show={selectedCount > 0}>
-                <button className="u-actionTextColor" onClick={() => this.props.updateFilter(this.props.options.field, null, 'CLEAR')}>All</button>
-              </If>
-            </div>
-            <div className="filter__options">
-              <ul>
-                {selectedValues}
-                <If show={this.state.expanded && this.props.options.showSuggestions}>
-                  {multiFacets}
-                </If>
-              </ul>
-            </div>
           </div>
-        </div>
-      </div>
+        }
+      </SearchContext.Consumer>
     );
   }
 }

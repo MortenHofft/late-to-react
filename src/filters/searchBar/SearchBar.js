@@ -38,6 +38,21 @@ const fieldSuggestions = [
     type: 'FIELD',
     field: 'country',
     description: 'From what country should the occurrence be from'
+  },
+  {
+    type: 'FIELD',
+    field: 'issue',
+    description: 'We flag issues when we notice them.'
+  },
+  {
+    type: 'FIELD',
+    field: 'basisOfRecord',
+    description: 'What is the evidence type for this occurrence'
+  },
+  {
+    type: 'FIELD',
+    field: 'institutionCode',
+    description: 'From what institution does the occurrence come from'
   }
 ];
 
