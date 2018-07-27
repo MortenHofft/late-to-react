@@ -81,7 +81,8 @@ class Table extends Component {
     this.state = {
       page: {limit: 50, offset: 0},
       occurrences: [],
-      showModalFilter: false
+      showModalFilter: false,
+      stickyCol: true
     }
   }
 
@@ -189,8 +190,8 @@ class Table extends Component {
     }
     let nextButton = this.state.page.offset + this.state.page.limit < this.state.count ? <i className="material-icons" onClick={() => this.nextPage()}>keyboard_arrow_right</i> : null;
     return (
-      <div>
-        <div className="tableArea">
+      <React.Fragment>
+        <section className="tableArea">
           <table id="table" className={scrolled + ' ' + stickyCol} onScroll={ this.bodyScroll }>
             <thead>
               <tr>
@@ -207,11 +208,11 @@ class Table extends Component {
               {nextButton}
             </div>
           </div>
-        </div>
+        </section>
         <If show={this.state.showModalFilter}>
           <ModalFilter onClose={this.handleHide} filter={this.props.filter} updateFilter={this.props.updateFilter} field={this.state.modalField}/>
         </If>
-      </div>
+      </React.Fragment>
     );
   }
 }

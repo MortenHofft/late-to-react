@@ -26,6 +26,7 @@ function MultiSuggest() {
             suggestPromises[field] = axios.get(url, {
                 cancelToken: cancelToken
             }).then(function(response){
+                response.data = response.data.slice(0, filter.limit);
                 if (suggestConfig[field].type === 'ENUM') {
                     return response.data.filter((e) => (e.toLowerCase().replace('_', ' ').startsWith(searchText.toLowerCase()))).slice(0,2);
                 } else {

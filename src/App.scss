@@ -35,6 +35,15 @@ button {
 main {
   margin-right: 350px;
   margin-left: 56px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  > section {
+    flex: 0 0 auto;
+    &:last-of-type {
+      flex: 1 1 auto;
+    }
+  }
 }
 
 .navDrawer {
@@ -48,10 +57,13 @@ main {
   padding: 10px;
 }
 
+.viewSelectorWrapper {
+  text-align: right;
+}
+
 .viewSelector {
   display: inline-block;
-  margin-top: 0;
-  display: flex;
+  margin: 0;
   right: 420px;
   top: 20px;
   list-style: none;
@@ -59,17 +71,22 @@ main {
   padding: 0;
   border: 1px solid #ddd;
   border-radius: 3px;
+  font-size: 12px;
   li {
-    background: deepskyblue;
-    flex: 1 1 auto;
+    display: inline-block;
     text-align: center;
-    padding: 10px;
   }
 }
 
 .viewSelector li a {
   text-decoration: none;
   color: inherit;
+  padding: 5px 10px;
+  display: inline-block;
+  &.active {
+    background: deepskyblue;
+    color: white;
+  }
 }
 
 .viewSelector li.active a {

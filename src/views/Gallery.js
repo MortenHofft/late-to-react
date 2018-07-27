@@ -49,13 +49,13 @@ class Gallery extends Component {
     });
 
     return (
-      <div>
+      <section>
         <div className="imageGallery">
           {listItems}
           <div className="imageGallery__more p-hidden" ng-click="occGallery.loadMore()" ng-if="!occGallery.endOfRecords"><span>Load more</span></div>
           <div className="imageGallery__more imageGallery__more__filler" ng-if="occGallery.endOfRecords"></div>
         </div>
-      </div>
+      </section>
     );
   }
 }

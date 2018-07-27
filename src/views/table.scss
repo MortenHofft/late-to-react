@@ -25,9 +25,17 @@ tbody {
 }*/
 
 .tableArea {
-    margin: 10px;
+    margin: 10px 0 10px 10px;
     border: 1px solid #ddd;
     border-radius: 3px;
+    display: flex;
+    flex-direction: column;
+    table {
+        flex: 1 1 auto;
+    }
+    .pagination {
+        flex: 0 0 auto;
+    }
 }
 .pagination {
     background: #f7f9fa;
@@ -46,7 +54,6 @@ tbody {
 table {
     display: grid; /* This is a (hacky) way to make the .grid element size to fit its content */
     overflow: auto;
-    max-height: calc(100vh - 350px);
     width: 100%;
     border-spacing: 0;
     border-collapse: separate;

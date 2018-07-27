@@ -29,7 +29,14 @@ button {
 
 main {
   margin-right: 350px;
-  margin-left: 56px; }
+  margin-left: 56px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh; }
+  main > section {
+    flex: 0 0 auto; }
+    main > section:last-of-type {
+      flex: 1 1 auto; }
 
 .navDrawer {
   width: 350px;
@@ -41,26 +48,32 @@ main {
   bottom: 0;
   padding: 10px; }
 
+.viewSelectorWrapper {
+  text-align: right; }
+
 .viewSelector {
   display: inline-block;
-  margin-top: 0;
-  display: flex;
+  margin: 0;
   right: 420px;
   top: 20px;
   list-style: none;
   background: white;
   padding: 0;
   border: 1px solid #ddd;
-  border-radius: 3px; }
+  border-radius: 3px;
+  font-size: 12px; }
   .viewSelector li {
-    background: deepskyblue;
-    flex: 1 1 auto;
-    text-align: center;
-    padding: 10px; }
+    display: inline-block;
+    text-align: center; }
 
 .viewSelector li a {
   text-decoration: none;
-  color: inherit; }
+  color: inherit;
+  padding: 5px 10px;
+  display: inline-block; }
+  .viewSelector li a.active {
+    background: deepskyblue;
+    color: white; }
 
 .viewSelector li.active a {
   background: darkseagreen;

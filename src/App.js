@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Router, Route, Switch, Link } from "react-router-dom";
+import { Router, Route, Switch, NavLink } from "react-router-dom";
 import _ from 'lodash';
 import objectHash from 'object-hash';
 import queryString from 'query-string'
@@ -40,18 +40,6 @@ class App extends Component {
         {
           type: 'FILTER',
           field: 'datasetKey'
-        },
-        {
-          type: 'FILTER',
-          field: 'country'
-        },
-        {
-          type: 'FILTER',
-          field: 'institutionCode'
-        },
-        {
-          type: 'FILTER',
-          field: 'taxonKey'
         }
       ]
     };
@@ -68,7 +56,6 @@ class App extends Component {
   }
 
   updateFilter(param, value, action) {
-    console.log('update in ap.js');
     let paramValues = asArray(this.state.filter.query[param]);
     if (action === 'CLEAR') {
       paramValues = '';
@@ -109,25 +96,22 @@ class App extends Component {
               <button onClick={() => (this.updateWidgets('datasetKey'))}>add new widget</button>
               <Summary filter={this.state.filter} updateFilter={this.updateFilter} />
             </section>
-            <section>
+            <section className="viewSelectorWrapper">
               <ul className="viewSelector">
                 <li>
-                  <Link to={{ pathname: '/', search: queryString.stringify(this.state.filter.query) }}>Table</Link>
+                  <NavLink to={{ pathname: '/', search: queryString.stringify(this.state.filter.query) }} exact={true} activeClassName="active">Table</NavLink>
                 </li>
                 <li>
-                  <Link to={{ pathname: '/gallery', search: queryString.stringify(this.state.filter.query) }}>Gallery</Link>
-                </li>
-                <li>
-                <Link to={{ pathname: '/split', search: queryString.stringify(this.state.filter.query) }}>Split</Link>
+                  <NavLink to={{ pathname: '/gallery', search: queryString.stringify(this.state.filter.query) }} activeClassName="active">Gallery</NavLink>
                 </li>
               </ul>
-              <Switch>
-                <Route exact path="/" render={(props) => <Table filter={this.state.filter} updateFilter={this.updateFilter} />} />
-                <Route path="/gallery" render={(props) => <Gallery filter={this.state.filter} updateFilter={this.updateFilter} />} />
-                <Route path="/split" render={(props) => <Split filter={this.state.filter} updateFilter={this.updateFilter} />} />
-                <Route component={NoMatch} />
-              </Switch>
             </section>
+            <Switch>
+              <Route exact path="/" render={(props) => <Table filter={this.state.filter} updateFilter={this.updateFilter} />} />
+              <Route path="/gallery" render={(props) => <Gallery filter={this.state.filter} updateFilter={this.updateFilter} />} />
+              <Route path="/split" render={(props) => <Split filter={this.state.filter} updateFilter={this.updateFilter} />} />
+              <Route component={NoMatch} />
+            </Switch>
           </main>
         </div>
       </Router>
