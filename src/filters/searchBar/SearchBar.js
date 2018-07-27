@@ -112,13 +112,12 @@ class SearchBar extends Component {
     let val = item.field;
     this.setState({ value: val });
     if (item.type === 'FIELD') {
-      console.log('Open select widget for: ' + val);
       this.setState({showModal: true, modalField: val});
     } else if (item.type === 'VALUE') {
       this.props.updateFilter(item.field, item.key, 'ADD');
     }
     
-    this.setState({forceOpen: false, value: ''});
+    this.setState({forceOpen: false, value: '', suggestions: []});
   }
 
   onKeyUp(e) {
