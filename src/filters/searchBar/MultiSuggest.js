@@ -1,5 +1,5 @@
 import axios from 'axios';
-import queryString from 'query-string';
+import queryString from 'qs';
 import Promise from 'bluebird';
 
 import config from '../../config';
@@ -22,21 +22,21 @@ function MultiSuggest() {
 
         let suggestPromises = {};
         Object.keys(suggestConfig).forEach(function(field){
-            let url = suggestConfig[field].endpoint + '?' + queryString.stringify(filter);
+            let url = suggestConfig[field].endpoint + '?' + queryString.stringify(filter, { indices: false, allowDots: true });
             suggestPromises[field] = axios.get(url, {
                 cancelToken: cancelToken
             }).then(function(response){
-                response.data = response.data.slice(0, filter.limit);
                 if (suggestConfig[field].type === 'ENUM') {
                     return response.data.filter((e) => (e.toLowerCase().replace('_', ' ').startsWith(searchText.toLowerCase()))).slice(0,2);
                 } else {
-                    return response.data;
+                    return response.data.slice(0, filter.limit);
                 }
             });
         });
 
         return Promise.props(suggestPromises)
             .then(function(result) {
+                console.log(result);
                 let list = [];
                 Object.keys(result).forEach(function(field){
                     let mapper;

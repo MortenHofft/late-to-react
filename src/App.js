@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Router, Route, Switch, NavLink } from "react-router-dom";
 import _ from 'lodash';
 import objectHash from 'object-hash';
-import queryString from 'query-string'
+import queryString from 'qs'
 
 import history from './history'
 
@@ -39,7 +39,7 @@ class App extends Component {
     this.updateWidgets = this.updateWidgets.bind(this);
     this.hasWidget = this.hasWidget.bind(this);
 
-    const query = queryString.parse(window.location.search);
+    const query = queryString.parse(window.location.search, { ignoreQueryPrefix: true });
     this.state = {
       filter: {
         query: query
@@ -92,12 +92,12 @@ class App extends Component {
     if (!paramValues) {
       delete filter[param];
     }
-    history.push(window.location.pathname + '?' + queryString.stringify(filter));
+    history.push(window.location.pathname + '?' + queryString.stringify(filter, { indices: false, allowDots: true }));
   }
 
   filterFromUrl(location) {
     const filter = {};
-    const query = queryString.parse(location.search);
+    const query = queryString.parse(location.search, { ignoreQueryPrefix: true });
     filter.hash = objectHash(query);
     filter.query = query;
     this.setState({ filter: filter });
@@ -120,10 +120,10 @@ class App extends Component {
               <section className="viewSelectorWrapper">
                 <ul className="viewSelector">
                   <li>
-                    <NavLink to={{ pathname: '/', search: queryString.stringify(this.state.filter.query) }} exact={true} activeClassName="active">Table</NavLink>
+                    <NavLink to={{ pathname: '/', search: queryString.stringify(this.state.filter.query, { indices: false, allowDots: true }) }} exact={true} activeClassName="active">Table</NavLink>
                   </li>
                   <li>
-                    <NavLink to={{ pathname: '/gallery', search: queryString.stringify(this.state.filter.query) }} activeClassName="active">Gallery</NavLink>
+                    <NavLink to={{ pathname: '/gallery', search: queryString.stringify(this.state.filter.query, { indices: false, allowDots: true }) }} activeClassName="active">Gallery</NavLink>
                   </li>
                 </ul>
               </section>

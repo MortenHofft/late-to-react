@@ -21,7 +21,7 @@
  */
 
 import objectHash from 'object-hash';
-import queryString from 'query-string'
+import queryString from 'qs'
 import _ from 'lodash';
 
 import history from './history'
@@ -42,7 +42,7 @@ export default class SearchManager {
         this.filterFromUrl = this.filterFromUrl.bind(this);
         this.updateWidgets = this.updateWidgets.bind(this);
 
-        const query = queryString.parse(window.location.search);
+        const query = queryString.parse(window.location.search, { ignoreQueryPrefix: true });
         this.filter = {
             query: query
         };
@@ -84,12 +84,12 @@ export default class SearchManager {
         if (!paramValues) {
             delete filter[param];
         }
-        history.push(window.location.pathname + '?' + queryString.stringify(filter));
+        history.push(window.location.pathname + '?' + queryString.stringify(filter, { indices: false, allowDots: true }));
     }
 
     filterFromUrl(location) {
         const filter = {};
-        const query = queryString.parse(location.search);
+        const query = queryString.parse(location.search, { ignoreQueryPrefix: true });
         filter.hash = objectHash(query);
         filter.query = query;
         this.filter = filter;

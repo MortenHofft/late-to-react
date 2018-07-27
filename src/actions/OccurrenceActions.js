@@ -4,7 +4,7 @@ import querystring from 'querystring';
 
 export function getOccurrences(query) {
     console.log(FilterStore.getQuery());
-    fetch('https://api.gbif.org/v1/occurrence/search?' + querystring.stringify(FilterStore.getQuery()))
+    fetch('//api.gbif.org/v1/occurrence/search?' + querystring.stringify(FilterStore.getQuery(), { indices: false, allowDots: true }))
       .then(res => res.json())
       .then(
         (result) => {

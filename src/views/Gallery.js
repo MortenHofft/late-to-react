@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import queryString from 'query-string'
+import queryString from 'qs'
 import _ from 'lodash';
 
 import GalleryImg from './GalleryImg';
@@ -29,7 +29,7 @@ class Gallery extends Component {
 
   updateResults() {
     let filter = _.merge({}, this.props.filter.query, {media_type: 'StillImage', limit: 50});
-    fetch('https://api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter))
+    fetch('//api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter, { indices: false, allowDots: true }))
       .then(res => res.json())
       .then(
         (result) => {

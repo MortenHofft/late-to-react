@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
-import queryString from 'query-string';
+import queryString from 'qs';
 import ReactAutocomplete from 'react-autocomplete';
 
 class Suggest extends Component {
@@ -24,7 +24,7 @@ class Suggest extends Component {
 
   getSuggestions(searchText) {
     let filter = {limit: 10, q: searchText};
-    fetch(this.props.endpoint + '?' + queryString.stringify(filter))
+    fetch(this.props.endpoint + '?' + queryString.stringify(filter, { indices: false, allowDots: true }))
       .then(res => res.json())
       .then(
         (suggestions) => {

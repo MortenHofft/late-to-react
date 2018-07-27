@@ -24,7 +24,7 @@ class PublisherTitle extends Component {
   }
 
   getTitle() {
-    fetch('https://api.gbif.org/v1/organization/' + this.props.id)
+    fetch('//api.gbif.org/v1/organization/' + this.props.id)
       .then(res => res.json())
       .then(
         (result) => {

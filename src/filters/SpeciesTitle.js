@@ -24,7 +24,7 @@ class SpeciesTitle extends Component {
   }
 
   getTitle() {
-    fetch('https://api.gbif.org/v1/species/' + this.props.id)
+    fetch('//api.gbif.org/v1/species/' + this.props.id)
       .then(res => res.json())
       .then(
         (result) => {

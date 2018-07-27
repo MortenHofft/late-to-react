@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import queryString from 'query-string';
+import queryString from 'qs';
 import ReactAutocomplete from 'react-autocomplete';
 
 let CancelToken = axios.CancelToken;
@@ -33,7 +33,7 @@ class Suggest extends Component {
     //construct search query
     let filter = {limit: 10, q: searchText};
     
-    axios.get(this.props.endpoint + '?' + queryString.stringify(filter), {
+    axios.get(this.props.endpoint + '?' + queryString.stringify(filter, { indices: false, allowDots: true }), {
         cancelToken: new CancelToken(function executor(c) {
           cancel = c;
         })

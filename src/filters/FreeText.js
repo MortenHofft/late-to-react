@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
-import queryString from 'query-string'
+import queryString from 'qs'
 import humanize from 'humanize-num'
 
 import Suggest from './SuggestKey'
@@ -62,7 +62,7 @@ class FreeText extends Component {
     delete filter.hash;
 
     if (this.props.filter.query[this.props.options.field]) {
-      let p1 = fetch('https://api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter));
+      let p1 = fetch('//api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter, { indices: false, allowDots: true }));
       promises.push(p1);
       this.setState({loading: true});
       p1.then(res => res.json())
@@ -82,7 +82,7 @@ class FreeText extends Component {
 
     if (this.props.options.showSuggestions) {
       filter[this.props.options.field] = undefined;
-      let p2 = fetch('https://api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter));
+      let p2 = fetch('//api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter, { indices: false, allowDots: true }));
       p2.then(res => res.json())
         .then(
           (result) => {

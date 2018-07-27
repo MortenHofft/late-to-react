@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import queryString from 'query-string'
+import queryString from 'qs'
 import _ from 'lodash';
 
 import displayName from '../filters/fieldFormats';
@@ -103,7 +103,7 @@ class Table extends Component {
 
   updateResults() {
     let filter = _.merge({}, this.props.filter.query, this.state.page);
-    fetch('https://api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter))
+    fetch('//api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter, { indices: false, allowDots: true }))
       .then(res => res.json())
       .then(
         (result) => {

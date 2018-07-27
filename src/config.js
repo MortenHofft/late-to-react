@@ -3,13 +3,13 @@ import displayName from './filters/fieldFormats';
 let suggest = {
     datasetKey: {
         type: 'KEY',
-        endpoint: 'https://api.gbif.org/v1/dataset/suggest',
+        endpoint: '//api.gbif.org/v1/dataset/suggest',
         key: 'key',
         title: 'title'
     },
     taxonKey: {
         type: 'KEY',
-        endpoint: 'https://api.gbif.org/v1/species/suggest',
+        endpoint: '//api.gbif.org/v1/species/suggest',
         key: 'key',
         title: 'scientificName',
         description: function(item){
@@ -27,25 +27,25 @@ let suggest = {
     },
     basisOfRecord: {
         type: 'ENUM',
-        endpoint: 'http://api.gbif.org/v1/enumeration/basic/BasisOfRecord'
+        endpoint: '//api.gbif.org/v1/enumeration/basic/BasisOfRecord'
     },
     issue: {
         type: 'ENUM',
-        endpoint: 'http://api.gbif.org/v1/enumeration/basic/OccurrenceIssue'
+        endpoint: '//api.gbif.org/v1/enumeration/basic/OccurrenceIssue'
     },
     country: {
         type: 'ENUM',
-        endpoint: 'http://api.gbif.org/v1/enumeration/basic/Country'
+        endpoint: '//api.gbif.org/v1/enumeration/basic/Country'
     },
     publishingOrg: {
         type: 'KEY',
-        endpoint: 'https://api.gbif.org/v1/organization/suggest',
+        endpoint: '//api.gbif.org/v1/organization/suggest',
         key: 'key',
         title: 'title'
     },
     institutionCode: {
         type: 'STRING',
-        endpoint: 'https://api.gbif.org/v1/occurrence/search/institutionCode'
+        endpoint: '//api.gbif.org/v1/occurrence/search/institutionCode'
     }
 };
 
@@ -68,6 +68,9 @@ let widgets = {
         },
         country: {
             options: {field: 'country', displayName: displayName('country'), showSuggestions: true, autoComplete: suggest.country}
+        },
+        issue: {
+            options: {field: 'issue', displayName: displayName('issue'), showSuggestions: true, autoComplete: suggest.issue}
         }
     }
 };
