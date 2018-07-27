@@ -170,6 +170,7 @@ class FreeText extends Component {
                     onSelect={this.onSelect} value={this.state.value}
                     itemKey={this.props.options.autoComplete.key}
                     itemTitle={this.props.options.autoComplete.title}
+                    itemDescription={this.props.options.autoComplete.description}
                     renderItem={this.props.options.autoComplete.renderItem}
                     />
         </div>

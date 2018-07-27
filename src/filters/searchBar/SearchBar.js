@@ -33,6 +33,11 @@ const fieldSuggestions = [
     type: 'FIELD',
     field: 'taxonKey',
     description: 'What taxon should the occurrence be or has as a parent'
+  },
+  {
+    type: 'FIELD',
+    field: 'country',
+    description: 'From what country should the occurrence be from'
   }
 ];
 
@@ -108,7 +113,7 @@ class SearchBar extends Component {
     this.setState({ value: val });
     if (item.type === 'FIELD') {
       console.log('Open select widget for: ' + val);
-      this.setState({showModal: true});
+      this.setState({showModal: true, modalField: val});
     } else if (item.type === 'VALUE') {
       this.props.updateFilter(item.field, item.key, 'ADD');
     }
@@ -221,7 +226,7 @@ class SearchBar extends Component {
           />
         </div>
         <If show={this.state.showModal}>
-          <ModalFilter onClose={this.handleHide} filter={this.props.filter} updateFilter={this.props.updateFilter} field="datasetKey" />
+          <ModalFilter onClose={this.handleHide} filter={this.props.filter} updateFilter={this.props.updateFilter} field={this.state.modalField} />
         </If>
       </React.Fragment>
     );

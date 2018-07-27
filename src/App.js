@@ -36,7 +36,24 @@ class App extends Component {
       filter: {
         query: query
       },
-      widgets: []
+      widgets: [
+        {
+          type: 'FILTER',
+          field: 'datasetKey'
+        },
+        {
+          type: 'FILTER',
+          field: 'country'
+        },
+        {
+          type: 'FILTER',
+          field: 'institutionCode'
+        },
+        {
+          type: 'FILTER',
+          field: 'taxonKey'
+        }
+      ]
     };
     this.state.filter.hash = objectHash(this.state.filter.query);
 

@@ -274,3 +274,7 @@ dd, dt {
   max-height: 60vh;
   width: 100%;
   z-index: 998; }
+  .suggestMenu > div {
+    padding: 5px 10px; }
+    .suggestMenu > div > div:first-of-type {
+      font-weight: bold; }

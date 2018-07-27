@@ -106,7 +106,7 @@ class Table extends Component {
       .then(res => res.json())
       .then(
         (result) => {
-            this.setState({occurrences: result.results});
+            this.setState({occurrences: result.results, count: result.count});
         },
         // Note: it's important to handle errors here
         // instead of a catch() block so that we don't swallow
@@ -119,6 +119,15 @@ class Table extends Component {
 
   nextPage() {
     this.setState({page: {offset: this.state.page.offset + this.state.page.limit, limit: this.state.page.limit}}, this.updateResults);
+  }
+
+  prevPage() {
+    let offset = Math.max(0, this.state.page.offset - this.state.page.limit);
+    this.setState({page: {offset: offset, limit: this.state.page.limit}}, this.updateResults);
+  }
+
+  firstPage() {
+    this.setState({page: {offset: 0, limit: this.state.page.limit}}, this.updateResults);
   }
 
   updateFilter(key, value) {
@@ -168,10 +177,21 @@ class Table extends Component {
 
     let scrolled = this.state.scrolled ? 'scrolled' : '';
     let stickyCol = this.state.stickyCol ? 'stickyCol' : '';
+
+    let backButtons = '';
+    if (this.state.page.offset > 0) {
+      backButtons = (
+        <React.Fragment>
+          <i className="material-icons" onClick={() => this.firstPage()}>first_page</i>
+          <i className="material-icons" onClick={() => this.prevPage()}>keyboard_arrow_left</i>
+        </React.Fragment>
+      );
+    }
+    let nextButton = this.state.page.offset + this.state.page.limit < this.state.count ? <i className="material-icons" onClick={() => this.nextPage()}>keyboard_arrow_right</i> : null;
     return (
       <div>
-        <div className={stickyCol}>
-          <table id="table" className={scrolled} onScroll={ this.bodyScroll }>
+        <div className="tableArea">
+          <table id="table" className={scrolled + ' ' + stickyCol} onScroll={ this.bodyScroll }>
             <thead>
               <tr>
                 {headers}
@@ -181,17 +201,12 @@ class Table extends Component {
               {tbody}
             </tbody>
           </table>
-          <div className="pagination-small">
-            <i class="material-icons">first_page</i>
-            <i class="material-icons">keyboard_arrow_left</i>
-            <i class="material-icons">keyboard_arrow_right</i>
+          <div className="pagination">
+            {backButtons}
+            <div>
+              {nextButton}
+            </div>
           </div>
-        </div>
-        <button onClick={() => this.nextPage()}>next</button>
-        <div>
-          <span>Filter</span>
-          {JSON.stringify(this.props.filter.query, null, 2)}
-          {JSON.stringify(this.state.page , null, 2)}
         </div>
         <If show={this.state.showModalFilter}>
           <ModalFilter onClose={this.handleHide} filter={this.props.filter} updateFilter={this.props.updateFilter} field={this.state.modalField}/>

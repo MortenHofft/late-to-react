@@ -67,16 +67,22 @@ class Suggest extends Component {
   render() {
     let keyField = this.props.itemKey;
     let titleField = keyField ? this.props.itemTitle || 'title' : undefined;
+    let descriptionField = this.props.itemDescription || (() => (undefined));
+
     let getItemValue = this.props.itemKey ? item => '' + item[keyField] : item => '' + item;
     let renderItem = function(item, highlighted) {
       let key = getItemValue(item);
       let title = keyField ? item[titleField] : item;
       return (
       <div key={key} style={{ backgroundColor: highlighted ? '#eee' : 'transparent'}}>
-        {title}
+        <div>{title}</div>
+        <div className="u-secondaryTextColor u-small">{descriptionField(item)}</div>
       </div>
       )};
     renderItem = this.props.renderItem ? this.props.renderItem : renderItem;
+
+    console.log(this.state.suggestions.length);
+    let shouldItemRender = keyField ? (item, value) => {return true;} : (item, value) => {return value !== '' && item.toLowerCase().startsWith(value.toLowerCase())};
 
     return (
         <ReactAutocomplete
@@ -89,6 +95,7 @@ class Suggest extends Component {
           items={this.state.suggestions}
           getItemValue={getItemValue}
           renderItem={renderItem} 
+          shouldItemRender={shouldItemRender}
           inputProps={{ placeholder: 'Search' }}
           value={this.state.value}
           onChange={e => this.onChange(e.target.value)}
@@ -98,22 +105,4 @@ class Suggest extends Component {
   }
 }
 
-function speciesTemplate(item, highlighted) {
-  let classification = [];
-  ['kingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species'].forEach(function(e){
-    if (item[e]) {
-      classification.push(<span key={e}>{item[e]}</span>);
-    }
-  });
-  return (
-    <div key={item.key} style={{ backgroundColor: highlighted ? 'tomato' : 'deepskyblue'}}>
-      {item.scientificName}
-      <div>
-        {classification}
-      </div>
-    </div>
-  );
-}
-
-export {speciesTemplate, Suggest};
 export default Suggest;

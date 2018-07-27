@@ -293,4 +293,10 @@ dd, dt {
   max-height: 60vh;
   width: 100%;
   z-index: 998;
+  > div {
+    padding: 5px 10px;
+    > div:first-of-type {
+      font-weight: bold;
+    }
+  }
 }

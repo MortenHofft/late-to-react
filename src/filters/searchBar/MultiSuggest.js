@@ -39,7 +39,7 @@ function MultiSuggest() {
                 let list = [];
                 Object.keys(result).forEach(function(field){
                     let mapper;
-                    if (suggestConfig[field].type === 'ENUM') {
+                    if (suggestConfig[field].type === 'ENUM' || suggestConfig[field].type === 'STRING') {
                         mapper = (e) => ({type: 'VALUE', field: field, key: e, value: e});
                     } else {
                         let description = suggestConfig[field].description || ((e) => (undefined));

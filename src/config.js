@@ -1,33 +1,14 @@
 import displayName from './filters/fieldFormats';
-import { speciesTemplate } from './filters/SuggestKey';
-
-var widgets = {
-    filters: {
-        basisOfRecord: {
-            options: {field: 'basisOfRecord', displayName: displayName('basisOfRecord'), showSuggestions: true, search: false }
-        },
-        taxonKey: {
-            options: {field: 'taxonKey', displayName: displayName('taxonKey'), showSuggestions: false, autoComplete: {endpoint: 'https://api.gbif.org/v1/species/suggest', key: 'key', renderItem: speciesTemplate}}
-        },
-        datasetKey: {
-            options: {field: 'datasetKey', displayName: displayName('datasetKey'), showSuggestions: true, autoComplete: {endpoint: 'https://api.gbif.org/v1/dataset/suggest', key: 'key'}}
-        },
-        publishingOrg: {
-            options: {field: 'publishingOrg', displayName: displayName('publishingOrg'), showSuggestions: true, autoComplete: {endpoint: 'https://api.gbif.org/v1/organization/suggest', key: 'key'}}
-        },
-        institutionCode: {
-            options: {field: 'institutionCode', displayName: displayName('institutionCode'), showSuggestions: true, autoComplete: {endpoint: 'https://api.gbif.org/v1/occurrence/search/institutionCode'}}
-        }
-    }
-};
 
 let suggest = {
     datasetKey: {
+        type: 'KEY',
         endpoint: 'https://api.gbif.org/v1/dataset/suggest',
         key: 'key',
         title: 'title'
     },
     taxonKey: {
+        type: 'KEY',
         endpoint: 'https://api.gbif.org/v1/species/suggest',
         key: 'key',
         title: 'scientificName',
@@ -51,6 +32,43 @@ let suggest = {
     issue: {
         type: 'ENUM',
         endpoint: 'http://api.gbif.org/v1/enumeration/basic/OccurrenceIssue'
+    },
+    country: {
+        type: 'ENUM',
+        endpoint: 'http://api.gbif.org/v1/enumeration/basic/Country'
+    },
+    publishingOrg: {
+        type: 'KEY',
+        endpoint: 'https://api.gbif.org/v1/organization/suggest',
+        key: 'key',
+        title: 'title'
+    },
+    institutionCode: {
+        type: 'STRING',
+        endpoint: 'https://api.gbif.org/v1/occurrence/search/institutionCode'
+    }
+};
+
+let widgets = {
+    filters: {
+        basisOfRecord: {
+            options: {field: 'basisOfRecord', displayName: displayName('basisOfRecord'), showSuggestions: true, search: false }
+        },
+        taxonKey: {
+            options: {field: 'taxonKey', displayName: displayName('taxonKey'), showSuggestions: false, autoComplete: suggest.taxonKey}
+        },
+        datasetKey: {
+            options: {field: 'datasetKey', displayName: displayName('datasetKey'), showSuggestions: true, autoComplete: suggest.datasetKey}
+        },
+        publishingOrg: {
+            options: {field: 'publishingOrg', displayName: displayName('publishingOrg'), showSuggestions: true, autoComplete: suggest.publishingOrg}
+        },
+        institutionCode: {
+            options: {field: 'institutionCode', displayName: displayName('institutionCode'), showSuggestions: true, autoComplete: suggest.institutionCode}
+        },
+        country: {
+            options: {field: 'country', displayName: displayName('country'), showSuggestions: true, autoComplete: suggest.country}
+        }
     }
 };
 
