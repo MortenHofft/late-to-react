@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import queryString from 'qs'
 import _ from 'lodash';
 
+import builder from '../queryStringBuilder';
+
 import GalleryImg from './GalleryImg';
 
 class Gallery extends Component {
@@ -28,12 +30,13 @@ class Gallery extends Component {
   }
 
   updateResults() {
-    let filter = _.merge({}, this.props.filter.query, {media_type: 'StillImage', limit: 50});
-    fetch('//api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter, { indices: false, allowDots: true }))
+    let filter = _.merge({}, this.props.filter.query, {media_type: 'STILL_IMAGE'});
+    // fetch('//api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter, { indices: false, allowDots: true }))
+    fetch('//localhost:9200/occurrences2/_search?size=50&' + builder.esBuilder(this.props.filter.query))
       .then(res => res.json())
       .then(
         (result) => {
-            this.setState({occurrences: result.results});
+            this.setState({occurrences: _.map(result.hits.hits, '_source')});
         },
         (error) => {
             this.setState({error: true});
@@ -44,7 +47,7 @@ class Gallery extends Component {
   render() {
     const listItems = this.state.occurrences.map(function(e, i){
       return (
-        <GalleryImg key={i} src={e.media[0].identifier} />
+        <GalleryImg key={i} src={e.imageIdentifier} />
       );
     });
 

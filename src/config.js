@@ -37,12 +37,12 @@ let suggest = {
         type: 'ENUM',
         endpoint: '//api.gbif.org/v1/enumeration/basic/Country'
     },
-    publishingOrg: {
+    /*publishingOrg: {
         type: 'KEY',
         endpoint: '//api.gbif.org/v1/organization/suggest',
         key: 'key',
         title: 'title'
-    },
+    },*/
     institutionCode: {
         type: 'STRING',
         endpoint: '//api.gbif.org/v1/occurrence/search/institutionCode'
@@ -55,19 +55,19 @@ let widgets = {
             options: {field: 'basisOfRecord', displayName: displayName('basisOfRecord'), showSuggestions: true, search: false }
         },
         taxonKey: {
-            options: {field: 'taxonKey', displayName: displayName('taxonKey'), showSuggestions: false, autoComplete: suggest.taxonKey}
+            options: {field: 'taxonKey', displayName: displayName('taxonKey'), showSuggestions: false, autoComplete: suggest.taxonKey, esField: 'backbone.taxonKey'}
         },
         datasetKey: {
             options: {field: 'datasetKey', displayName: displayName('datasetKey'), showSuggestions: true, autoComplete: suggest.datasetKey}
         },
-        publishingOrg: {
+        /*publishingOrg: {
             options: {field: 'publishingOrg', displayName: displayName('publishingOrg'), showSuggestions: true, autoComplete: suggest.publishingOrg}
-        },
+        },*/
         institutionCode: {
             options: {field: 'institutionCode', displayName: displayName('institutionCode'), showSuggestions: true, autoComplete: suggest.institutionCode}
         },
         country: {
-            options: {field: 'country', displayName: displayName('country'), showSuggestions: true, autoComplete: suggest.country}
+            options: {field: 'country', displayName: displayName('country'), showSuggestions: true, autoComplete: suggest.country, esField: 'countryCode'}
         },
         issue: {
             options: {field: 'issue', displayName: displayName('issue'), showSuggestions: true, autoComplete: suggest.issue}

@@ -2,6 +2,8 @@
 let _ = require('lodash');
 let qs = require('qs');
 
+let config = require('./config').default;
+
 function asArray(value) {
     if (_.isUndefined(value)) {
       return [];
@@ -24,7 +26,7 @@ function esBuilder(query) {
     query = query || {};
     query = JSON.parse(JSON.stringify(query));
 
-    let querystring = 'q=';
+    let querystring = '';
     if (query.q) {
         querystring += query.q;
         delete query.q;
@@ -37,7 +39,8 @@ function esBuilder(query) {
             key = key.substr(1);
             negated = true;
         }
-        let fieldQuery = negated ? `!(${key}:` : `${key}:`;
+        key = _.get(config.widgets.filters[key], 'options.esField') || key;
+        let fieldQuery = negated ? `(!${key}:` : `${key}:`;
         if (_.isArray(a)) {
             fieldQuery += `(${_.join(a.map(getValue), ' OR ')})`;
         } else {
@@ -51,17 +54,53 @@ function esBuilder(query) {
         }
         querystring += fieldQuery;
     });
-
     return querystring;
 }
 
-console.log(esBuilder(
-    {
-        q: 'fungi',
-        'backbone.taxonKey': 95, 
-        "!issue": ['TAXON_MATCH_HIGHERRANK', 'b']
+function removeQuotes(str) {
+    return str.startsWith('"') ? str.substr(1, str.length - 2) : str;
+}
+
+function parseValue(str) {
+    if (str.startsWith('(')) {
+        str = str.substr(1, str.length - 2);
+        let parts = str.split(' OR ');
+        return parts.map(removeQuotes);
+    } else {
+        return removeQuotes(str);
     }
-));
+}
+
+function esParser(str) {
+    let query = {};
+    let parts = str.split(' AND ');
+    parts.forEach(function(part){
+        let negated = false;
+        if (part.startsWith('(!')) {
+            negated = true;
+            part = part.substr(1, part.length - 3);
+        }
+        let colonIndex = part.indexOf(':');
+        let key = 'q';
+        if (colonIndex !== -1) {
+            key = part.substr(0, colonIndex);
+        }
+        let values = parseValue(part.substr(colonIndex + 1));
+        query[key] = values;
+    });
+    return query;
+}
+
+let a = 'fungi AND backbone.taxonKey:95 AND (!issue:("TAXON_MATCH_HIGHERRANK" OR "ZERO_COORDINATE")) AND issue:("COUNTRY_COORDINATE_MISMATCH")';
+console.log(esParser(a))
+// console.log(esBuilder(
+//     {
+//         q: 'fungi',
+//         'backbone.taxonKey': 95, 
+//         "!issue": ['TAXON_MATCH_HIGHERRANK', 'ZERO_COORDINATE'],
+//         "issue": ['COUNTRY_COORDINATE_MISMATCH']
+//     }
+// ));
 
 // console.log(qs.stringify({
 //     q: 'fungi',
@@ -76,4 +115,6 @@ console.log(esBuilder(
 // });
 // console.log(qs.parse(b, { indices: false, allowDots: true }));
 
-// export default esBuilder;
+export default {
+    esBuilder, esParser
+};

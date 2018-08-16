@@ -45,8 +45,7 @@ class App extends Component {
         query: query
       },
       widgets: [
-        { type: 'FILTER', field: 'datasetKey' },
-        { type: 'FILTER', field: 'country' }
+        { type: 'FILTER', field: 'datasetKey' }
       ],
       updateFilter: this.updateFilter,
       updateWidgets: this.updateWidgets,

@@ -2,10 +2,13 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import queryString from 'qs'
 import humanize from 'humanize-num'
+import axios from 'axios'
 
 import Suggest from './SuggestKey'
-import {SearchContext} from '../searchContext';
+import { SearchContext } from '../searchContext';
 import If from './If'
+
+import builder from '../queryStringBuilder';
 
 function asArray(value) {
   if (_.isUndefined(value)) {
@@ -58,17 +61,35 @@ class FreeText extends Component {
 
   updateFacets() {
     let promises = [];
-    let filter = _.merge({}, this.props.filter.query, { limit: 0, facetLimit: 5, facet: this.props.options.field });
+    let filter = _.merge({}, this.props.filter.query);
     delete filter.hash;
 
     if (this.props.filter.query[this.props.options.field]) {
-      let p1 = fetch('//api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter, { indices: false, allowDots: true }));
+      //let p1 = fetch('//api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter, { indices: false, allowDots: true }));
+
+      let queryString = builder.esBuilder(filter);
+      let query = {
+        size: 0,
+        aggs: {
+          facets: {
+            terms: { field: this.props.options.field, size: 5 }
+          }
+        }
+      };
+      if (queryString !== '') {
+        query.query = {
+          query_string: {
+            query: queryString
+          }
+        };
+      }
+      let p1 = axios.post('//localhost:9200/occurrences2/_search', query);
+
       promises.push(p1);
-      this.setState({loading: true});
-      p1.then(res => res.json())
-        .then(
+      this.setState({ loading: true });
+      p1.then(
           (result) => {
-            this.setState({ facets: result.facets[0].counts, count: result.count });
+            this.setState({ facets: result.data.aggregations.facets.buckets, count: result.data.hits.total });
           },
           // Note: it's important to handle errors here
           // instead of a catch() block so that we don't swallow
@@ -82,11 +103,30 @@ class FreeText extends Component {
 
     if (this.props.options.showSuggestions) {
       filter[this.props.options.field] = undefined;
-      let p2 = fetch('//api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter, { indices: false, allowDots: true }));
-      p2.then(res => res.json())
-        .then(
+      // let p2 = fetch('//api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter, { indices: false, allowDots: true }));
+      
+      let queryString = builder.esBuilder(filter);
+      let query = {
+        size: 0,
+        aggs: {
+          facets: {
+            terms: { field: this.props.options.field, size: 5 }
+          }
+        }
+      };
+      if (queryString !== '') {
+        query.query = {
+          query_string: {
+            query: queryString
+          }
+        };
+      }
+      console.log(query);
+      let p2 = axios.post('//localhost:9200/occurrences2/_search', query);
+
+      p2.then(
           (result) => {
-            this.setState({ multiFacets: result.facets[0].counts, total: result.count });
+            this.setState({ multiFacets: result.data.aggregations.facets.buckets, total: result.data.hits.total });
           },
           // Note: it's important to handle errors here
           // instead of a catch() block so that we don't swallow
@@ -99,8 +139,8 @@ class FreeText extends Component {
     }
 
     Promise.all(promises)
-      .then(() => {this.setState({loading: false})})
-      .catch(() => {this.setState({loading: false})});
+      .then(() => { this.setState({ loading: false }) })
+      .catch(() => { this.setState({ loading: false }) });
   }
 
   handleChange(event) {
@@ -112,11 +152,11 @@ class FreeText extends Component {
     let progress;
     count = count || 0;
     total = total || count;
-    let width = {width: (100*count/total) + '%'};
+    let width = { width: (100 * count / total) + '%' };
     progress = (
       <div className="percentageBar"><div style={width}></div></div>
     );
-    
+
     let Formater = this.state.displayName;
     return (
       <li key={id} className={active ? 'active' : 'disabled'}>
@@ -124,7 +164,7 @@ class FreeText extends Component {
           <input type="checkbox" />
           <div className="filter__facet">
             <div className="filter__facet__title">
-              <div className="u-ellipsis u-semibold u-medium"><Formater id={id} /></div><If show={count > 0}><div className="u-secondaryTextColor u-small">{ humanize(count) }</div></If>
+              <div className="u-ellipsis u-semibold u-medium"><Formater id={id} /></div><If show={count > 0}><div className="u-secondaryTextColor u-small">{humanize(count)}</div></If>
             </div>
             {progress}
           </div>
@@ -135,7 +175,7 @@ class FreeText extends Component {
 
   onSelect(val) {
     console.log('selected', val);
-    this.setState({value: ''});
+    this.setState({ value: '' });
     this.props.updateFilter(this.props.options.field, val, 'ADD')
   }
 
@@ -144,42 +184,42 @@ class FreeText extends Component {
     let count = this.state.count;
     let total = this.state.total;
     let formatOption = this.formatOption;
-    
+
     let facets = asArray(this.state.facets);
     let selectedValues = asArray(this.props.filter.query[this.props.options.field]);
     if (facets.length > 0) {
-      facets = _.keyBy(facets, 'name');
+      facets = _.keyBy(facets, 'key');
     }
     selectedValues = selectedValues.map(function (e) {
-      return formatOption(e, _.get(facets, e + '.count'), count, 'REMOVE', true);
+      return formatOption(e, _.get(facets, e + '.doc_count'), count, 'REMOVE', true);
     });
     let multiFacets = asArray(this.state.multiFacets);
     _.remove(multiFacets, function (e) {
-      return asArray(props.filter.query[props.options.field]).indexOf(e.name) !== -1;
+      return asArray(props.filter.query[props.options.field]).indexOf(e.key) !== -1;
     });
     multiFacets = multiFacets.map(function (e) {
-      return formatOption(e.name, e.count, total, 'ADD', selectedValues.length === 0);
+      return formatOption(e.key, e.doc_count, total, 'ADD', selectedValues.length === 0);
     });
     let selectedCount = asArray(this.props.filter.query[this.props.options.field]).length;
-    
+
     let searchBlock = '';
     if (this.state.expanded && this.props.options.search !== false) {
       searchBlock = (
         <div className="filter__search">
           <i className="material-icons u-secondaryTextColor">search</i>
-          <Suggest  endpoint={this.props.options.autoComplete.endpoint} 
-                    onSelect={this.onSelect} value={this.state.value}
-                    itemKey={this.props.options.autoComplete.key}
-                    itemTitle={this.props.options.autoComplete.title}
-                    itemDescription={this.props.options.autoComplete.description}
-                    renderItem={this.props.options.autoComplete.renderItem}
-                    />
+          <Suggest endpoint={this.props.options.autoComplete.endpoint}
+            onSelect={this.onSelect} value={this.state.value}
+            itemKey={this.props.options.autoComplete.key}
+            itemTitle={this.props.options.autoComplete.title}
+            itemDescription={this.props.options.autoComplete.description}
+            renderItem={this.props.options.autoComplete.renderItem}
+          />
         </div>
       );
     }
     return (
       <SearchContext.Consumer>
-        {({updateWidgets, hasWidget}) =>
+        {({ updateWidgets, hasWidget }) =>
           <div>
             <div className="filter">
               <If show={this.state.loading}><div className="loader"></div></If>

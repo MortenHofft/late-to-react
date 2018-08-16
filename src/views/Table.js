@@ -7,6 +7,8 @@ import If from '../filters/If';
 import ModalFilter from '../filters/ModalFilter';
 import config from '../config';
 
+import builder from '../queryStringBuilder';
+
 require('./table.css');
 
 class Table extends Component {
@@ -29,7 +31,7 @@ class Table extends Component {
           width: 200
         },
         {
-          name: 'country',
+          name: 'countryCode',
           width: 100
         },
         {
@@ -79,7 +81,7 @@ class Table extends Component {
       ]
     };
     this.state = {
-      page: {limit: 50, offset: 0},
+      page: {size: 50, from: 0},
       occurrences: [],
       showModalFilter: false,
       stickyCol: true
@@ -103,11 +105,18 @@ class Table extends Component {
 
   updateResults() {
     let filter = _.merge({}, this.props.filter.query, this.state.page);
-    fetch('//api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter, { indices: false, allowDots: true }))
+    // fetch('//api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter, { indices: false, allowDots: true }))
+    let querystring = builder.esBuilder(this.props.filter.query);
+    let url = '//localhost:9200/occurrences2/_search?' + queryString.stringify(this.state.page);
+    if (querystring !== '') {
+      url += '&q=' + querystring;
+    }
+    fetch(url)
       .then(res => res.json())
       .then(
         (result) => {
-            this.setState({occurrences: result.results, count: result.count});
+            let occurrences = _.map(result.hits.hits, '_source');
+            this.setState({occurrences: occurrences, count: result.hits.total});
         },
         // Note: it's important to handle errors here
         // instead of a catch() block so that we don't swallow
@@ -119,16 +128,16 @@ class Table extends Component {
   }
 
   nextPage() {
-    this.setState({page: {offset: this.state.page.offset + this.state.page.limit, limit: this.state.page.limit}}, this.updateResults);
+    this.setState({page: {from: this.state.page.from + this.state.page.size, size: this.state.page.size}}, this.updateResults);
   }
 
   prevPage() {
-    let offset = Math.max(0, this.state.page.offset - this.state.page.limit);
-    this.setState({page: {offset: offset, limit: this.state.page.limit}}, this.updateResults);
+    let from = Math.max(0, this.state.page.from - this.state.page.size);
+    this.setState({page: {from: from, size: this.state.page.size}}, this.updateResults);
   }
 
   firstPage() {
-    this.setState({page: {offset: 0, limit: this.state.page.limit}}, this.updateResults);
+    this.setState({page: {from: 0, size: this.state.page.size}}, this.updateResults);
   }
 
   updateFilter(key, value) {
@@ -180,7 +189,7 @@ class Table extends Component {
     let stickyCol = this.state.stickyCol ? 'stickyCol' : '';
 
     let backButtons = '';
-    if (this.state.page.offset > 0) {
+    if (this.state.page.from > 0) {
       backButtons = (
         <React.Fragment>
           <i className="material-icons" onClick={() => this.firstPage()}>first_page</i>
@@ -188,7 +197,7 @@ class Table extends Component {
         </React.Fragment>
       );
     }
-    let nextButton = this.state.page.offset + this.state.page.limit < this.state.count ? <i className="material-icons" onClick={() => this.nextPage()}>keyboard_arrow_right</i> : null;
+    let nextButton = this.state.page.from + this.state.page.size < this.state.count ? <i className="material-icons" onClick={() => this.nextPage()}>keyboard_arrow_right</i> : null;
     return (
       <React.Fragment>
         <section className="tableArea">
