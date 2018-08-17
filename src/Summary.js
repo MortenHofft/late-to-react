@@ -12,7 +12,7 @@ function Summary(props) {
     const style = {margin: '10px 0 10px 10px'};
     let filterChips = [];
     let index = 0;
-    Object.keys(props.filter.query).forEach(function(param){
+    Object.keys(props.filter.query.must).forEach(function(param){
         if (_.isArray(props.filter.query[param])) {
             props.filter.query[param].forEach(function(value){
                 filterChips.push(getListItem(param, value, index++, props.updateFilter));

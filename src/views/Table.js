@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import queryString from 'qs'
 import _ from 'lodash';
+import axios from 'axios';
 
 import displayName from '../filters/fieldFormats';
 import If from '../filters/If';
 import ModalFilter from '../filters/ModalFilter';
 import config from '../config';
 
-import builder from '../queryStringBuilder';
+import builder from '../esPostBuilder';
 
 require('./table.css');
 
@@ -107,9 +108,10 @@ class Table extends Component {
     let filter = _.merge({}, this.props.filter.query, this.state.page);
     // fetch('//api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter, { indices: false, allowDots: true }))
     let querystring = builder.esBuilder(this.props.filter.query);
+    console.log(querystring);
     let url = '//localhost:9200/occurrences2/_search?' + queryString.stringify(this.state.page);
     if (querystring !== '') {
-      url += '&q=' + querystring;
+      // url += '&q=' + querystring;
     }
     fetch(url)
       .then(res => res.json())

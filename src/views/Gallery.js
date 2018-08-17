@@ -32,7 +32,12 @@ class Gallery extends Component {
   updateResults() {
     let filter = _.merge({}, this.props.filter.query, {media_type: 'STILL_IMAGE'});
     // fetch('//api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter, { indices: false, allowDots: true }))
-    fetch('//localhost:9200/occurrences2/_search?size=50&' + builder.esBuilder(this.props.filter.query))
+    let querystring = builder.esBuilder(filter);
+    let url = '//localhost:9200/occurrences2/_search?size=50';
+    if (querystring !== '') {
+      url += '&q=' + querystring;
+    }
+    fetch(url)
       .then(res => res.json())
       .then(
         (result) => {

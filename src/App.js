@@ -3,6 +3,7 @@ import { Router, Route, Switch, NavLink } from "react-router-dom";
 import _ from 'lodash';
 import objectHash from 'object-hash';
 import queryString from 'qs'
+import bodybuilder from 'bodybuilder'
 
 import history from './history'
 
@@ -35,26 +36,26 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.updateFilter = this.updateFilter.bind(this);
-    this.filterFromUrl = this.filterFromUrl.bind(this);
+    this.getFilterFromUrl = this.getFilterFromUrl.bind(this);
     this.updateWidgets = this.updateWidgets.bind(this);
     this.hasWidget = this.hasWidget.bind(this);
+    this.filterAsUrl = this.filterAsUrl.bind(this);
 
-    const query = queryString.parse(window.location.search, { ignoreQueryPrefix: true });
+    const filter = this.getFilterFromUrl(window.location.search);
+    console.log(filter);
     this.state = {
-      filter: {
-        query: query
-      },
+      filter: filter,
       widgets: [
-        { type: 'FILTER', field: 'datasetKey' }
+        // { type: 'FILTER', field: 'taxonKey' },
+        // { type: 'FILTER', field: 'issue' }
       ],
       updateFilter: this.updateFilter,
       updateWidgets: this.updateWidgets,
       hasWidget: this.hasWidget
     };
-    this.state.filter.hash = objectHash(this.state.filter.query);
 
     history.listen((location, action) => {
-      this.filterFromUrl(location);
+      this.setState({ filter: this.getFilterFromUrl(location.search) });
     });
   }
 
@@ -72,8 +73,9 @@ class App extends Component {
     return typeof _.find(this.state.widgets, {field: field}) !== 'undefined';
   }
 
-  updateFilter(param, value, action) {
-    let paramValues = asArray(this.state.filter.query[param]);
+  updateFilter(param, value, action, negated) {
+    let type = negated ? 'must_not' : 'must'
+    let paramValues = asArray(_.get(this.state, `filter.query.${type}[${param}]`, []));
     if (action === 'CLEAR') {
       paramValues = '';
     } else if (action === 'ADD') {
@@ -87,19 +89,37 @@ class App extends Component {
     } else {
       paramValues = [value];
     }
-    let filter = _.assign({}, this.state.filter.query, { [param]: paramValues });
+    // let filter = _.assign({}, this.state.filter.query, { [param]: paramValues });
+    let filter = _.assign({}, this.state.filter.query);
+    _.set(filter, `${type}.${param}`, paramValues);
     if (!paramValues) {
       delete filter[param];
     }
-    history.push(window.location.pathname + '?' + queryString.stringify(filter, { indices: false, allowDots: true }));
+
+    if (_.isEmpty(filter)) {
+      history.push(window.location.pathname);
+    } else {
+      history.push(window.location.pathname + '?filter=' + this.filterAsUrl(filter));
+    }
   }
 
-  filterFromUrl(location) {
+  filterAsUrl(filter) {
+    filter.must = _.omit(filter.must || {}, _.isEmpty);
+    filter.must_not = _.omit(filter.must_not || {}, _.isEmpty);
+    return encodeURIComponent(JSON.stringify(filter));
+  }
+
+  getFilterFromUrl(location) {
     const filter = {};
-    const query = queryString.parse(location.search, { ignoreQueryPrefix: true });
-    filter.hash = objectHash(query);
-    filter.query = query;
-    this.setState({ filter: filter });
+    const query = queryString.parse(location, { ignoreQueryPrefix: true });
+    if (query.filter) {
+      filter.query = JSON.parse(decodeURIComponent(query.filter));
+    } else {
+      filter.query = {};
+    }
+    filter.hash = objectHash(filter.query);
+    console.log(filter);
+    return filter;
   }
 
   render() {
@@ -116,22 +136,24 @@ class App extends Component {
                 <section>
                   <Summary filter={this.state.filter} updateFilter={this.updateFilter} />
                 </section>
-              <section className="viewSelectorWrapper">
-                <ul className="viewSelector">
-                  <li>
-                    <NavLink to={{ pathname: '/', search: queryString.stringify(this.state.filter.query, { indices: false, allowDots: true }) }} exact={true} activeClassName="active">Table</NavLink>
-                  </li>
-                  <li>
-                    <NavLink to={{ pathname: '/gallery', search: queryString.stringify(this.state.filter.query, { indices: false, allowDots: true }) }} activeClassName="active">Gallery</NavLink>
-                  </li>
-                </ul>
-              </section>
-              <Switch>
-                <Route exact path="/" render={(props) => <Table filter={this.state.filter} updateFilter={this.updateFilter} />} />
-                <Route path="/gallery" render={(props) => <Gallery filter={this.state.filter} updateFilter={this.updateFilter} />} />
-                <Route path="/split" render={(props) => <Split filter={this.state.filter} updateFilter={this.updateFilter} />} />
-                <Route component={NoMatch} />
-              </Switch>
+                <If show={true}>
+                <section className="viewSelectorWrapper">
+                  <ul className="viewSelector">
+                    <li>
+                      <NavLink to={{ pathname: '/', search: queryString.stringify({filter: this.filterAsUrl(this.state.filter.query)}, { indices: false, allowDots: true }) }} exact={true} activeClassName="active">Table</NavLink>
+                    </li>
+                    <li>
+                      <NavLink to={{ pathname: '/gallery', search: queryString.stringify({filter: this.filterAsUrl(this.state.filter.query)}, { indices: false, allowDots: true }) }} activeClassName="active">Gallery</NavLink>
+                    </li>
+                  </ul>
+                </section>
+                <Switch>
+                  <Route exact path="/" render={(props) => <Table filter={this.state.filter} updateFilter={this.updateFilter} />} />
+                  <Route path="/gallery" render={(props) => <Gallery filter={this.state.filter} updateFilter={this.updateFilter} />} />
+                  <Route path="/split" render={(props) => <Split filter={this.state.filter} updateFilter={this.updateFilter} />} />
+                  <Route component={NoMatch} />
+                </Switch>
+                </If>
             </main>
           </div>
         </SearchContext.Provider>

@@ -36,7 +36,7 @@ const fieldSuggestions = [
   },
   {
     type: 'FIELD',
-    field: 'country',
+    field: 'countryCode',
     description: 'From what country should the occurrence be from'
   },
   {

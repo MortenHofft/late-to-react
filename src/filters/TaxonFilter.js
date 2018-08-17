@@ -23,8 +23,7 @@ function asArray(value) {
 function identity(props) {
   return <span>{props.id}</span>
 }
-
-class FreeText extends Component {
+class TaxonFilter extends Component {
   constructor(props) {
     super(props);
 
@@ -64,7 +63,7 @@ class FreeText extends Component {
     let promises = [];
     let filter = _.merge({}, this.props.filter.query);
     delete filter.hash;
-    
+
     if (this.props.filter.query[this.props.options.field]) {
       //let p1 = fetch('//api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter, { indices: false, allowDots: true }));
 
@@ -73,19 +72,17 @@ class FreeText extends Component {
         size: 0,
         aggs: {
           facets: {
-            terms: { field: this.props.options.field, size: 5 } //burde egentlig være 
+            terms: { field: this.props.options.field, size: 5 }
           }
         }
       };
       if (queryString !== '') {
         query.query = {
-          bool: {
-            filter: [],
-            must_not: []
+          query_string: {
+            query: queryString
           }
         };
       }
-      console.log(query);
       let p1 = axios.post('//localhost:9200/occurrences2/_search', query);
 
       promises.push(p1);
@@ -163,7 +160,7 @@ class FreeText extends Component {
     let Formater = this.state.displayName;
     return (
       <li key={id} className={active ? 'active' : 'disabled'}>
-        <label onClick={() => this.props.updateFilter(this.props.options.field, id, action, true)}>
+        <label onClick={() => this.props.updateFilter(this.props.options.field, id, action)}>
           <input type="checkbox" />
           <div className="filter__facet">
             <div className="filter__facet__title">
@@ -275,4 +272,4 @@ class FreeText extends Component {
   }
 }
 
-export default FreeText;
+export default TaxonFilter;
