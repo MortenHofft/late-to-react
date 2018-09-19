@@ -302,6 +302,15 @@ dd, dt {
   color: #6f6f6f;
 }
 
+// .chip--not span {
+//   background: #e0705c;
+//   color: white;
+// }
+.chip--not span:nth-of-type(2) {
+  // color: #7b3c2f;
+  background: tomato;
+  color: white;
+}
 
 .suggestMenu {
   position: absolute;

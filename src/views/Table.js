@@ -105,18 +105,14 @@ class Table extends Component {
   }
 
   updateResults() {
-    let filter = _.merge({}, this.props.filter.query, this.state.page);
-    // fetch('//api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter, { indices: false, allowDots: true }))
     let querystring = builder.esBuilder(this.props.filter.query);
-    console.log(querystring);
-    let url = '//localhost:9200/occurrences2/_search?' + queryString.stringify(this.state.page);
-    if (querystring !== '') {
-      // url += '&q=' + querystring;
-    }
-    fetch(url)
-      .then(res => res.json())
+    let filter = _.merge({}, querystring, this.state.page);
+    console.log(filter);
+    let url = '//localhost:9200/occurrences2/_search?';
+    axios.post(url, filter)
       .then(
-        (result) => {
+        (response) => {
+            let result = response.data;
             let occurrences = _.map(result.hits.hits, '_source');
             this.setState({occurrences: occurrences, count: result.hits.total});
         },

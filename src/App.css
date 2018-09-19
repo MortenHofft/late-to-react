@@ -279,6 +279,10 @@ dd, dt {
   border-radius: 3px 0 0 3px;
   color: #6f6f6f; }
 
+.chip--not span:nth-of-type(2) {
+  background: tomato;
+  color: white; }
+
 .suggestMenu {
   position: absolute;
   border-radius: 3px;

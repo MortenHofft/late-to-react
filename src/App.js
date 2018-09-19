@@ -86,6 +86,9 @@ class App extends Component {
       _.remove(paramValues, function (n) {
         return n === value;
       });
+      if (_.isEmpty(paramValues)) {
+        paramValues = undefined;
+      }
     } else {
       paramValues = [value];
     }
@@ -93,7 +96,10 @@ class App extends Component {
     let filter = _.assign({}, this.state.filter.query);
     _.set(filter, `${type}.${param}`, paramValues);
     if (!paramValues) {
-      delete filter[param];
+      delete filter[type][param];
+    }
+    if (_.isEmpty(filter[type])) {
+      delete filter[type];
     }
 
     if (_.isEmpty(filter)) {
@@ -104,8 +110,9 @@ class App extends Component {
   }
 
   filterAsUrl(filter) {
-    filter.must = _.omit(filter.must || {}, _.isEmpty);
-    filter.must_not = _.omit(filter.must_not || {}, _.isEmpty);
+    filter.must = _.omitBy(filter.must || {}, _.isEmpty);
+    filter.must_not = _.omitBy(filter.must_not || {}, _.isEmpty);
+    filter = _.omitBy(filter || {}, _.isEmpty);
     return encodeURIComponent(JSON.stringify(filter));
   }
 
