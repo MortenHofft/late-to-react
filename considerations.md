@@ -17,8 +17,13 @@ It should be able to work as:
 * Possibly wrapped components for non-React applications?
 * As a drop in on GBIF.org - this is really a way to test how modular it is as GBIF.org is an Angular app.
 * In a configurable product with CMS and possibly custom pages.
-* Style should be somewhat overwritable.
-* A redirect for downloads feels strange. On the other hand that is where the actual 
+* In a light weight node portal
+
+That is quite a variety of contexts. It isn't clear to me how to accomodate them all in one product.
+
+**Other**
+Style should be somewhat overwritable.
+A redirect for downloads feels strange. On the other hand that is where the actual 
 
 Dependencies would be:
 * A pipeline build ES index.
@@ -50,3 +55,37 @@ Alternatively only support the explorer as one block. The latter seems by far th
 
 The table as a component, that takes a state and some callbacks. 
 The coordinater as a component
+
+# Hosted solution
+how would it work
+makes use of the occurrence search, with configurable linking to the registry.
+It also has a content system and the code should only be updated one place. That is you cannot add code, customize code etc. If you need that, then you need to use the APIs and perhaps components from the hosted solution. It is in other word not an extendable product. The customizable product is the APIs and tools.
+The only thing you can customize is a few styling things and how things are linked together.
+
+Having it as one codebase means that a new site is:
+a js shared between all.
+a js style shared
+optional custom style
+local config
+  endpoints
+  fields
+  translations
+So essentially a html page and a couple of js and json files that could be hosted anywhere.
+
+An initial assumption could be. node app to create/manage sites. they are created in github as a repo. you can edit the prose in github (later perhaps by app). Jenkins will build the sites. Ideally that hook can be done in a gerneal way or programmatically.
+
+So 
+* Node app to manage/create/edit site config and content. Will create repo and hooks in Github.
+* Github repo is the actual site with config and content
+* Jenkins builds and deploys. Ideally a generic build that takes data from an arbitrary site repo, builds and deploys to a hook configured destination.
+* Site is static. Everyone shares a common js and css. Content database could be lunr.
+* Interface translations is a generic crowdin project. Content translations is a part of the yaml frontmatter.
+* Downloads links to GBIF.org
+* Login if any will use GBIF.org
+* Registry, ES, image cache and map servers either shared or same API but different installations.
+
+For non-invasive updates simply update the central js/css.
+For non backwards compatible changes, then transform all repo content and configurations as well.
+Versioning unclear:
+* each build adds a version (could check if the js had changed)? then we need to rebuild all upon js change.
+* only update js if new build, but then check with ajax and suggest a reload (new version available).
