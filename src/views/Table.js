@@ -79,6 +79,10 @@ class Table extends Component {
           name: 'species',
           width: 100
         },
+        {
+          name: 'gbifID',
+          width: 100
+        },
       ]
     };
     this.state = {
@@ -107,7 +111,6 @@ class Table extends Component {
   updateResults() {
     let querystring = builder.esBuilder(this.props.filter.query);
     let filter = _.merge({}, querystring, this.state.page);
-    console.log(filter);
     let url = '//localhost:9200/occurrences2/_search?';
     axios.post(url, filter)
       .then(
@@ -158,6 +161,9 @@ class Table extends Component {
   getRow(item) {
     return this.fieldConfig.fields.map(function(field){
       let DisplayName = displayName(field.name);
+      if (field.name === 'gbifID') {
+        return <td key={field.name}><a href={`//gbif.org/occurrence/${item.gbifID}`}><DisplayName id={item[field.name]} /></a></td>;
+      }
       return <td key={field.name}><DisplayName id={item[field.name]} /></td>;
     });
   }

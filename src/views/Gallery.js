@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import queryString from 'qs'
+import axios from 'axios';
 import _ from 'lodash';
 
-import builder from '../queryStringBuilder';
+import builder from '../esPostBuilder';
 
 import GalleryImg from './GalleryImg';
 
@@ -30,27 +30,26 @@ class Gallery extends Component {
   }
 
   updateResults() {
-    let filter = _.merge({}, this.props.filter.query, {media_type: 'STILL_IMAGE'});
-    // fetch('//api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter, { indices: false, allowDots: true }))
+    let filter = _.merge({}, this.props.filter.query, { must: { media_type: ['STILL_IMAGE'] } });
     let querystring = builder.esBuilder(filter);
-    let url = '//localhost:9200/occurrences2/_search?size=50';
-    if (querystring !== '') {
-      url += '&q=' + querystring;
-    }
-    fetch(url)
-      .then(res => res.json())
+    console.log(querystring);
+    filter = _.merge({size: 20}, querystring, this.state.page);
+
+    let url = '//localhost:9200/occurrences2/_search';
+    axios.post(url, filter)
       .then(
-        (result) => {
-            this.setState({occurrences: _.map(result.hits.hits, '_source')});
+        (response) => {
+          let result = response.data;
+          this.setState({ occurrences: _.map(result.hits.hits, '_source') });
         },
         (error) => {
-            this.setState({error: true});
+          this.setState({ error: true });
         }
       )
   }
 
   render() {
-    const listItems = this.state.occurrences.map(function(e, i){
+    const listItems = this.state.occurrences.map(function (e, i) {
       return (
         <GalleryImg key={i} src={e.imageIdentifier} />
       );

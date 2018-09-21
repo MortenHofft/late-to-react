@@ -8,7 +8,7 @@ import Suggest from './SuggestKey'
 import { SearchContext } from '../searchContext';
 import If from './If'
 
-import builder from '../queryStringBuilder';
+import builder from '../esPostBuilder';
 
 function asArray(value) {
   if (_.isUndefined(value)) {
@@ -64,12 +64,12 @@ class FreeText extends Component {
     let promises = [];
     let filter = _.merge({}, this.props.filter.query);
     delete filter.hash;
-    
+    let query, queryFilter;
     if (this.props.filter.query[this.props.options.field]) {
       //let p1 = fetch('//api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter, { indices: false, allowDots: true }));
 
-      let queryString = builder.esBuilder(filter);
-      let query = {
+      queryFilter = builder.esBuilder(filter);
+      query = {
         size: 0,
         aggs: {
           facets: {
@@ -77,15 +77,7 @@ class FreeText extends Component {
           }
         }
       };
-      if (queryString !== '') {
-        query.query = {
-          bool: {
-            filter: [],
-            must_not: []
-          }
-        };
-      }
-      console.log(query);
+      query = _.merge(query, queryFilter);
       let p1 = axios.post('//localhost:9200/occurrences2/_search', query);
 
       promises.push(p1);
@@ -108,8 +100,8 @@ class FreeText extends Component {
       filter[this.props.options.field] = undefined;
       // let p2 = fetch('//api.gbif.org/v1/occurrence/search?' + queryString.stringify(filter, { indices: false, allowDots: true }));
       
-      let queryString = builder.esBuilder(filter);
-      let query = {
+      queryFilter = builder.esBuilder(filter);
+      query = {
         size: 0,
         aggs: {
           facets: {
@@ -117,14 +109,7 @@ class FreeText extends Component {
           }
         }
       };
-      if (queryString !== '') {
-        query.query = {
-          query_string: {
-            query: queryString
-          }
-        };
-      }
-      console.log(query);
+      query = _.merge(query, queryFilter);
       let p2 = axios.post('//localhost:9200/occurrences2/_search', query);
 
       p2.then(

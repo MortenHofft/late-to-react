@@ -47,7 +47,7 @@ class App extends Component {
       filter: filter,
       widgets: [
         // { type: 'FILTER', field: 'taxonKey' },
-        // { type: 'FILTER', field: 'issue' }
+        { type: 'FILTER', field: 'issue' }
       ],
       updateFilter: this.updateFilter,
       updateWidgets: this.updateWidgets,

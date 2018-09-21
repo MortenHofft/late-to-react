@@ -142,6 +142,9 @@ prose https://tympanus.net/Tutorials/MediumStylePageTransition/#3
 Create an index as I think it should look.
 
 Start with occurrence standalone explorer. Proof of concept. Taking a config.
+Doesen't need to do much in this version I guess.
 
 Then do a hosted site proof of concept. 
 Rewrite occurrence explorer so that it can be used in this context.
+
+So full iteration quickly. The rewritting, will hopefully flush out issues, that can be kept in mind when doing a second iteration.

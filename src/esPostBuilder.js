@@ -25,6 +25,10 @@ function getValue(val) {
 function esBuilder(query) {
   let builder = bodybuilder();
   _.forOwn(query.must, function(value, field){
+      console.log(field);
+      if (field === 'taxonKey') {
+          field = 'backbone.taxonKey'
+      }
     builder.filter('terms', field, [].concat(value));
   });
   _.forOwn(query.must_not, function(value, field){
