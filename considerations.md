@@ -56,6 +56,30 @@ Alternatively only support the explorer as one block. The latter seems by far th
 The table as a component, that takes a state and some callbacks. 
 The coordinater as a component
 
+# Occurrence search architecture thoughts
+individual components would need
+* current filter
+* queryBuilder and/or requestWrapper endpoint
+* callbacks
+* translation library
+* general configurations
+
+say Table
+What is the filter to apply?
+Where and how to ask for the table data.
+What lib/file to use for translations of e.g. columns?
+An update filter callback (e.g. click '+' on a country name to add it to the filters)
+Where is the image cache? What endpoint/index? What to do when clicking a row (e.g. url template)?
+
+QueryStateManager
+Translation lib
+QueryComposer (helps with creating queryies)
+
+there is a hard depdency on a registry with same API and keys as the GBIF one. And an ES index with a known schema with keys corresponding to the central registry.
+
+Start with the table, splitting data management from presentation.
+But then how about 
+
 # Hosted solution
 how would it work
 makes use of the occurrence search, with configurable linking to the registry.
@@ -89,3 +113,35 @@ For non backwards compatible changes, then transform all repo content and config
 Versioning unclear:
 * each build adds a version (could check if the js had changed)? then we need to rebuild all upon js change.
 * only update js if new build, but then check with ajax and suggest a reload (new version available).
+
+# Seperate product
+Create a simple portal with custom index or subset of index.
+Should list
+datasets, institutions
+occurrence search
+downloads via gbif.org
+login using gbif.org credentials
+have prose articles
+
+A node app that lets you register a new site (if you are allowed to. e.g. a node manager)
+A new site is essentially just a configuration and a list of articles. The node app serves all sites (or could) as they are simply one basic html, with script tags for the configurations. The content search is a build lunr index. The content is managed in the app. either using a simple on premise cms or a custom one that is simply markdown with frontmatter.
+
+
+# Style inspiration
+Occurrence search facet/filters
+https://carto.com/blog/what-online-retailers-can-learn-mapping-sales-data/
+
+searchbar
+app.contentful
+
+ideas for article style
+prose https://tympanus.net/Tutorials/MediumStylePageTransition/#3
+
+
+# Aproach
+Create an index as I think it should look.
+
+Start with occurrence standalone explorer. Proof of concept. Taking a config.
+
+Then do a hosted site proof of concept. 
+Rewrite occurrence explorer so that it can be used in this context.
